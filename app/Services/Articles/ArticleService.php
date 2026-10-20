@@ -31,9 +31,12 @@ class ArticleService
      */
     public function loadForDisplay(WebsiteArticle $article): WebsiteArticle
     {
-        return $article->load(['user' => function ($query) {
+        $ranks = app(RankRepository::class);
+
+        return $article->load(['user' => function ($query) use ($ranks) {
             $query->select('id', 'username', 'look', 'motto', 'rank', 'hidden_staff', 'online')
-                ->with(['permission' => fn ($query) => app(RankRepository::class)->forDisplay($query)]);
+                ->addSelect($ranks->userKey())
+                ->with(['permission' => fn ($query) => $ranks->forDisplay($query)]);
         }]);
     }
 
