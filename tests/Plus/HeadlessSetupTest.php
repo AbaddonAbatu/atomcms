@@ -67,3 +67,17 @@ it('returns native Plus staff grouped by their actual active role', function () 
         ->and($response->json('data.0.users.0.username'))->toBe($owner->username)
         ->and($response->json('data.1.users'))->toBe([]);
 });
+
+it('renders Plus staff cards with their rank details', function (string $theme) {
+    DB::table('roles')->insert([
+        ['id' => 1, 'slug' => 'user', 'name' => 'User', 'description' => '', 'weight' => 1, 'security_level' => 1, 'badge_code' => '', 'is_staff' => false, 'is_hidden' => false, 'created_at' => now(), 'updated_at' => now()],
+        ['id' => 9, 'slug' => 'owner', 'name' => 'Owner', 'description' => '', 'weight' => 900, 'security_level' => 7, 'badge_code' => '', 'is_staff' => true, 'is_hidden' => false, 'created_at' => now(), 'updated_at' => now()],
+    ]);
+    $staff = User::factory()->count(2)->create(['rank' => 7]);
+    setSetting('theme', $theme);
+
+    $this->actingAs($staff->firstOrFail())
+        ->get(route('staff.index'))
+        ->assertOk()
+        ->assertSee([$staff[0]->username, $staff[1]->username, 'Owner']);
+})->with(['atom', 'dusk']);
