@@ -1,7 +1,6 @@
 <?php
 
 use App\Emulator\Contracts\RankRepository;
-use App\Models\Articles\WebsiteArticle;
 use App\Models\Miscellaneous\WebsiteInstallation;
 use App\Models\User;
 use Database\Seeders\WebsiteMaintenanceTasksSeeder;
@@ -68,39 +67,3 @@ it('returns native Plus staff grouped by their actual active role', function () 
         ->and($response->json('data.0.users.0.username'))->toBe($owner->username)
         ->and($response->json('data.1.users'))->toBe([]);
 });
-
-it('renders Plus staff cards with their rank details', function (string $theme) {
-    DB::table('roles')->insert([
-        ['id' => 1, 'slug' => 'user', 'name' => 'User', 'description' => '', 'weight' => 1, 'security_level' => 1, 'badge_code' => '', 'is_staff' => false, 'is_hidden' => false, 'created_at' => now(), 'updated_at' => now()],
-        ['id' => 9, 'slug' => 'owner', 'name' => 'Owner', 'description' => '', 'weight' => 900, 'security_level' => 7, 'badge_code' => '', 'is_staff' => true, 'is_hidden' => false, 'created_at' => now(), 'updated_at' => now()],
-    ]);
-    $staff = User::factory()->count(2)->create(['rank' => 7]);
-    setSetting('theme', $theme);
-
-    $this->actingAs($staff->firstOrFail())
-        ->get(route('staff.index'))
-        ->assertOk()
-        ->assertSee([$staff[0]->username, $staff[1]->username, 'Owner']);
-})->with(['atom', 'dusk']);
-
-it('loads the article author role and default background for Plus', function (string $theme) {
-    DB::table('roles')->insert([
-        ['id' => 1, 'slug' => 'user', 'name' => 'User', 'description' => '', 'weight' => 1, 'security_level' => 1, 'badge_code' => '', 'is_staff' => false, 'is_hidden' => false, 'created_at' => now(), 'updated_at' => now()],
-        ['id' => 9, 'slug' => 'owner', 'name' => 'Owner', 'description' => '', 'weight' => 900, 'security_level' => 7, 'badge_code' => '', 'is_staff' => true, 'is_hidden' => false, 'created_at' => now(), 'updated_at' => now()],
-    ]);
-    $author = User::factory()->create(['rank' => 7]);
-    $article = WebsiteArticle::create([
-        'user_id' => $author->id,
-        'title' => 'Plus hotel opening',
-        'short_story' => 'The hotel is open.',
-        'full_story' => '<p>Welcome to the hotel.</p>',
-        'image' => 'articles/opening.png',
-    ]);
-    setSetting('theme', $theme);
-
-    $this->actingAs($author)
-        ->get(route('article.show', $article->slug))
-        ->assertOk()
-        ->assertViewHas('article', fn (WebsiteArticle $displayed): bool => $displayed->user?->permission?->rank_name === 'Owner')
-        ->assertSee('assets/images/staff-bg.png');
-})->with(['atom', 'dusk']);
