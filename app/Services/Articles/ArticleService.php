@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ArticleService
 {
+    public function __construct(private readonly RankRepository $ranks) {}
+
     /**
      * @return Collection<int, WebsiteArticle>|LengthAwarePaginator<int, WebsiteArticle>
      */
@@ -31,12 +33,9 @@ class ArticleService
      */
     public function loadForDisplay(WebsiteArticle $article): WebsiteArticle
     {
-        $ranks = app(RankRepository::class);
-
-        return $article->load(['user' => function ($query) use ($ranks) {
-            $query->select('id', 'username', 'look', 'motto', 'rank', 'hidden_staff', 'online')
-                ->addSelect($ranks->userKey())
-                ->with(['permission' => fn ($query) => $ranks->forDisplay($query)]);
+        return $article->load(['user' => function ($query) {
+            $query->select('id', 'username', 'look', 'motto', $this->ranks->userKey(), 'hidden_staff', 'online')
+                ->with(['permission' => fn ($query) => $this->ranks->forDisplay($query)]);
         }]);
     }
 
