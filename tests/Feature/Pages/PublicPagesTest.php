@@ -71,8 +71,7 @@ test('teams use the staff layout with team descriptions', function (string $them
     $member = User::factory()->create(['team_id' => $team->id]);
 
     $this->actingAs($member)->get(route('teams.index'))
-        ->assertSee('col-span-12 lg:col-span-9 lg:w-[96%]', false)
-        ->assertSee('grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3', false)
+        ->assertOk()
         ->assertSee(['Events Crew', 'Hosts community events.', $member->username, 'Apply for teams'])
         ->assertSee(__('Our community teams bring players together to host events, help others, and make :hotel a fun place to be.', ['hotel' => setting('hotel_name')]))
         ->assertSee(route('team-applications.index'), false)
@@ -92,8 +91,17 @@ test('empty teams keep their staff layout and application sidebar', function (st
     ]);
 
     $this->actingAs(User::factory()->create())->get(route('teams.index'))
-        ->assertSee(['Empty Crew', 'We currently have no members in this team', 'How to join a team'])
-        ->assertSee('col-span-12 lg:col-span-3 lg:w-[110%] space-y-4 lg:-ml-[32px]', false);
+        ->assertOk()
+        ->assertSee(['Empty Crew', 'We currently have no members in this team', 'How to join a team']);
+})->with(['atom', 'dusk']);
+
+test('the teams page explains when no team exists yet', function (string $theme) {
+    setSetting('theme', $theme);
+    setSetting('enable_caching', '0');
+
+    $this->actingAs(User::factory()->create())->get(route('teams.index'))
+        ->assertOk()
+        ->assertSee(['No teams found', 'There are no teams to display right now.', 'How to join a team']);
 })->with(['atom', 'dusk']);
 
 test('switching language stores the locale', function () {

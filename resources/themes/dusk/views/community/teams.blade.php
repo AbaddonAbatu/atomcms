@@ -3,7 +3,7 @@
 
     <div class="col-span-12 lg:col-span-9 lg:w-[96%]">
         <div class="flex flex-col gap-y-4">
-            @foreach ($employees as $employee)
+            @forelse ($employees as $employee)
                 <x-content.staff-content-section :badge="$employee->badge" :color="$employee->staff_color">
                     <x-slot:title>
                         {{ $employee->rank_name }}
@@ -25,7 +25,21 @@
                         </div>
                     @endif
                 </x-content.staff-content-section>
-            @endforeach
+            @empty
+                <x-content.content-card icon="chat-icon" classes="border border-gray-900">
+                    <x-slot:title>
+                        {{ __('No teams found') }}
+                    </x-slot:title>
+
+                    <x-slot:under-title>
+                        {{ __('Please check back later.') }}
+                    </x-slot:under-title>
+
+                    <div class="px-2 text-sm space-y-4 text-gray-200">
+                        <p>{{ __('There are no teams to display right now.') }}</p>
+                    </div>
+                </x-content.content-card>
+            @endforelse
         </div>
     </div>
 
@@ -50,13 +64,13 @@
             </div>
         </x-content.content-card>
 
-        <x-content.content-card icon="chat-icon" classes="borderborder-gray-900">
+        <x-content.content-card icon="chat-icon" classes="border border-gray-900">
             <x-slot:title>
                 {{ __('Apply for teams') }}
             </x-slot:title>
 
             <x-slot:under-title>
-                {{ __('How to join a team', ['hotel' => setting('hotel_name')]) }}
+                {{ __('How to join a team') }}
             </x-slot:under-title>
 
             <div class="px-2 text-sm space-y-4 text-gray-200">
