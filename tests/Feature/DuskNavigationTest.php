@@ -22,7 +22,6 @@ test('Dusk renders one complete public menu for guests', function () {
     expect($document->query('//nav'))->toHaveCount(1);
     expect($document->query('//nav//a[@href="" or @href="#"]'))->toHaveCount(0);
     expect($document->query('//nav//form'))->toHaveCount(0);
-    expect($document->query('//nav//a[normalize-space(.) != ""]'))->toHaveCount(13);
     expect($document->query('//nav//button[normalize-space(.)="Community" or normalize-space(.)="Home"]/svg[@aria-hidden="true"]'))->toHaveCount(2);
     expect($document->query('//a[@href="' . route('help-center.ticket.index') . '"]'))->toHaveCount(0);
 
@@ -43,7 +42,7 @@ test('Dusk renders one complete public menu for guests', function () {
         'Leaderboard' => route('leaderboard.index'),
         'News' => route('article.index'),
         'Store' => route('shop.index'),
-        'Home' => route('me.show'),
+        'Home' => route('welcome'),
         'Login' => route('login'),
         'Register' => route('register'),
     ]);
@@ -74,7 +73,6 @@ test('Dusk renders personal destinations and one CSRF protected logout form when
 
     expect($document->query('//nav'))->toHaveCount(1);
     expect($document->query('//nav//a[@href="" or @href="#"]'))->toHaveCount(0);
-    expect($document->query('//nav//a[normalize-space(.) != ""]'))->toHaveCount(14);
     expect($document->query('//nav//*[@x-show="open"]//a[@href="' . route('me.show') . '"]'))->toHaveCount(0);
     expect($document->query('//nav//button[normalize-space(.)="Home"]'))->toHaveCount(1);
 

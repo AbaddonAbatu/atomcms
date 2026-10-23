@@ -10,10 +10,8 @@
             this.open = true
             this.$nextTick(() => this.$refs.panel.querySelector('a, button')?.focus())
         },
-        focusTrigger() {
-            return this.$refs.toggleButton && this.$refs.toggleButton.offsetParent !== null
-                ? this.$refs.toggleButton
-                : this.$refs.button
+        triggerElement() {
+            return this.$refs.toggleButton ?? this.$refs.button
         },
         toggle(event) {
             if (
@@ -22,6 +20,7 @@
                 window.matchMedia('(min-width: 64rem)').matches
             ) {
                 this.openedByHover = true
+                this.open = true
                 return
             }
 
@@ -29,7 +28,7 @@
                 return this.close()
             }
 
-            this.focusTrigger().focus()
+            this.triggerElement().focus()
             this.openedByHover = false
             this.open = true
         },
@@ -57,13 +56,13 @@
             this.openedByHover = false
 
             if (focusAfter || this.$refs.panel.contains(this.$refs.button.ownerDocument.activeElement)) {
-                (focusAfter || this.focusTrigger()).focus()
+                (focusAfter || this.triggerElement()).focus()
             }
         }
     }"
     x-on:pointerenter="openOnHover($event)"
     x-on:pointerleave="closeOnLeave($event)"
-    x-on:keydown.escape="if (open) { $event.preventDefault(); $event.stopPropagation(); close(focusTrigger()) }"
+    x-on:keydown.escape="if (open) { $event.preventDefault(); $event.stopPropagation(); close(triggerElement()) }"
     x-on:focusin.window="! $el.contains($event.target) && close()"
     x-on:click.outside="close()"
     x-id="['dropdown-button']"
@@ -96,6 +95,7 @@
     <button
         x-ref="button"
         x-on:click="toggle($event)"
+        x-on:keydown.down="openFromKeyboard($event)"
         aria-expanded="false"
         :aria-expanded="open"
         :aria-controls="$id('dropdown-button')"
@@ -114,12 +114,7 @@
         {{ $slot }}
 
         @if(($showChevron || $responsive) && !$href)
-            <svg xmlns="http://www.w3.org/2000/svg" @class(['h-5 w-5 text-gray-400', 'lg:hidden' => $responsive && !$showChevron]) viewBox="0 0 20 20" aria-hidden="true"
-                 fill="currentColor">
-                <path fill-rule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clip-rule="evenodd"/>
-            </svg>
+            <x-navigation.chevron :classes="$responsive && !$showChevron ? 'lg:hidden' : ''" />
         @endif
     @if($href)
     </a>
@@ -130,12 +125,9 @@
         aria-expanded="false"
         :aria-expanded="open"
         :aria-controls="$id('dropdown-button')"
-        class="lg:hidden"
     >
         <span class="sr-only">{{ $slot }}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-        </svg>
+        <x-navigation.chevron />
     </button>
     @else
     </button>

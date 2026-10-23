@@ -3,7 +3,9 @@
     x-data="{
         menuOpen: false,
         closeMenu() {
-            if (!this.menuOpen || this.$refs.menuToggle.offsetParent === null) return
+            if (!this.menuOpen || this.$refs.menuToggle.offsetParent === null) {
+                return
+            }
 
             this.menuOpen = false
 
@@ -72,22 +74,19 @@
                 </x-slot:children>
             </x-navigation.dropdown>
 
-            <a href="{{ route('leaderboard.index') }}" @class(['flex flex-col gap-1 lg:items-center transition ease-in-out hover:text-[#ac93da]', 'active' => request()->routeIs('leaderboard.*')])>
-                <img class="icon hidden lg:block" src="{{ asset('/assets/images/dusk/leaderboard_icon.png') }}" alt="">
+            <x-navigation.link :route="route('leaderboard.index')" icon="leaderboard_icon.png" route-group="leaderboard.*">
                 {{ __('Leaderboard') }}
-            </a>
+            </x-navigation.link>
 
-            <a href="{{ route('article.index') }}" @class(['flex flex-col gap-1 lg:items-center transition ease-in-out hover:text-[#ac93da]', 'active' => request()->routeIs('article.*')])>
-                <img class="icon hidden lg:block" src="{{ asset('/assets/images/dusk/news_icon.png') }}" alt="">
+            <x-navigation.link :route="route('article.index')" icon="news_icon.png" route-group="article.*">
                 {{ __('News') }}
-            </a>
+            </x-navigation.link>
 
-            <a href="{{ route('shop.index') }}" @class(['flex flex-col gap-1 lg:items-center transition ease-in-out hover:text-[#ac93da]', 'active' => request()->routeIs('shop.*')])>
-                <img class="icon hidden lg:block" src="{{ asset('/assets/images/dusk/store_icon.png') }}" alt="">
+            <x-navigation.link :route="route('shop.index')" icon="store_icon.png" route-group="shop.*">
                 {{ __('Store') }}
-            </a>
+            </x-navigation.link>
 
-            <x-navigation.dropdown icon="home_icon.png" :href="route('me.show')" :route-group="['me.*', 'home.*', 'draw-badge', 'settings.*', 'welcome', 'register*']" child-classes="min-w-[150px] lg:left-auto lg:right-0" :uppercase="true" :responsive="true">
+            <x-navigation.dropdown icon="home_icon.png" :href="auth()->check() ? route('me.show') : route('welcome')" :route-group="['me.*', 'home.*', 'draw-badge', 'settings.*', 'welcome', 'register*']" child-classes="min-w-[150px] lg:left-auto lg:right-0" :uppercase="true" :responsive="true">
                 {{ __('Home') }}
 
                 <x-slot:children>
