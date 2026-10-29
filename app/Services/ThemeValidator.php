@@ -7,6 +7,7 @@ use App\Exceptions\ThemePresentationException;
 use App\Support\FilePath;
 use DirectoryIterator;
 use Illuminate\Filesystem\Filesystem;
+use stdClass;
 use Throwable;
 
 class ThemeValidator
@@ -70,6 +71,123 @@ class ThemeValidator
         }
 
         return $this->definitions[$id] ?? throw ThemePresentationException::unknownTheme($id);
+    }
+
+    /**
+     * Basic checks before activating a theme: a valid definition, required
+     * views and a usable build manifest.
+     * The `theme` setting is only written when this is empty.
+     *
+     * @return list<string>
+     */
+    public function activationProblems(string $id, bool $production): array
+    {
+        $this->discover();
+
+        if (isset($this->rejected[$id])) {
+            return $this->rejected[$id];
+        }
+
+        if (! isset($this->definitions[$id])) {
+            return [ThemePresentationException::unknownTheme($id)->getMessage()];
+        }
+
+        $theme = $this->definitions[$id];
+
+        return array_merge($this->viewProblems($theme), $this->assetProblems($theme, $production));
+    }
+
+    /** @return list<string> */
+    public function viewProblems(ThemeDefinition $theme): array
+    {
+        $problems = [];
+
+        foreach ($this->missingViews($theme) as $key => $file) {
+            $problems[] = "Missing view [{$key}]: {$file}";
+        }
+
+        return $problems;
+    }
+
+    /** @return array<string, string> */
+    public function missingViews(ThemeDefinition $theme): array
+    {
+        $missing = [];
+
+        foreach (self::REQUIRED_VIEWS as $key) {
+            if (! $this->files->isFile($theme->viewPath() . DIRECTORY_SEPARATOR . str_replace('.', DIRECTORY_SEPARATOR, $key) . '.blade.php')) {
+                $missing[$key] = $theme->viewFile($key);
+            }
+        }
+
+        return $missing;
+    }
+
+    /** @return list<string> */
+    public function assetProblems(ThemeDefinition $theme, bool $production): array
+    {
+        $problems = [];
+
+        if ($this->files->exists($theme->hotFile())) {
+            if (! $production) {
+                return [];
+            }
+
+            $problems[] = 'Remove the development hot file ' . $this->displayPath($theme->hotFile()) . ' before deploying.';
+        }
+
+        $path = public_path($theme->buildDirectory() . '/manifest.json');
+        $displayPath = $this->displayPath($path);
+
+        if (! $this->files->isFile($path)) {
+            $problems[] = "Missing build manifest {$displayPath}.";
+
+            return $problems;
+        }
+
+        try {
+            $manifest = json_decode($this->files->get($path), flags: JSON_THROW_ON_ERROR);
+        } catch (Throwable $exception) {
+            $problems[] = "Cannot read build manifest {$displayPath}: {$exception->getMessage()}.";
+
+            return $problems;
+        }
+
+        if (! $manifest instanceof stdClass) {
+            $problems[] = "Build manifest {$displayPath} must be a JSON object.";
+
+            return $problems;
+        }
+
+        foreach ($theme->viteEntrypoints() as $entrypoint) {
+            if (! property_exists($manifest, $entrypoint)) {
+                $problems[] = "Build manifest {$displayPath} has no entry for {$entrypoint}.";
+
+                continue;
+            }
+
+            $entry = $manifest->{$entrypoint};
+
+            if (! $entry instanceof stdClass || ! is_string($entry->file ?? null)) {
+                $problems[] = "Build manifest {$displayPath} entry {$entrypoint} has no emitted file.";
+            }
+        }
+
+        return $problems;
+    }
+
+    /** @return list<string> */
+    public function buildProblems(ThemeDefinition $theme): array
+    {
+        $problems = [];
+
+        foreach ($theme->entrypoints() as $source) {
+            if (! $this->files->isFile($theme->path . DIRECTORY_SEPARATOR . $source)) {
+                $problems[] = "Missing entrypoint file [{$source}].";
+            }
+        }
+
+        return $problems;
     }
 
     public function isRelativeThemePath(string $path): bool
@@ -173,5 +291,10 @@ class ThemeValidator
     private function samePath(string $first, string $second): bool
     {
         return PHP_OS_FAMILY === 'Windows' ? strcasecmp($first, $second) === 0 : $first === $second;
+    }
+
+    private function displayPath(string $path): string
+    {
+        return FilePath::relativeTo($path, base_path()) ?? str_replace('\\', '/', $path);
     }
 }

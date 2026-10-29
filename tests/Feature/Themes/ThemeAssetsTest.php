@@ -167,6 +167,10 @@ test('missing Blade media produces a warning while validation and the page succe
     unset($manifest['resources/themes/dusk/images/ghost.png']);
     File::put($path, json_encode($manifest, JSON_THROW_ON_ERROR));
 
+    $this->artisan('atom:themes:validate', ['theme' => 'dusk', '--production' => true])
+        ->expectsOutput('dusk: valid')
+        ->assertSuccessful();
+
     installHotel();
     setSetting('theme', 'dusk');
     Log::spy();

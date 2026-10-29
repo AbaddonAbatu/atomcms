@@ -2,10 +2,27 @@
 
 use App\Console\Commands\AtomInstallCommand;
 use App\Emulator\EmulatorManager;
+use App\Models\Miscellaneous\WebsiteSetting;
 use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+
+beforeEach(function (): void {
+    $this->installThemeOriginalPublicPath = public_path();
+    $this->installThemeOriginalStoragePath = storage_path();
+    $this->installThemeTemporaryPath = sys_get_temp_dir() . '/atom-install-theme-' . bin2hex(random_bytes(12));
+    app()->usePublicPath(base_path('tests/Fixtures/vite/manifest'));
+    app()->useStoragePath($this->installThemeTemporaryPath);
+    File::ensureDirectoryExists(storage_path('vite'));
+});
+
+afterEach(function (): void {
+    app()->usePublicPath($this->installThemeOriginalPublicPath);
+    app()->useStoragePath($this->installThemeOriginalStoragePath);
+    File::deleteDirectory($this->installThemeTemporaryPath);
+});
 
 /**
  * Runs only the theme step of atom:install, so the test touches neither .env
@@ -34,6 +51,38 @@ function runInstallerThemeStep(array $options = []): string
 
     return $output->fetch();
 }
+
+test('the installer writes the chosen theme through the validated path', function () {
+    installHotel();
+    setSetting('theme', 'dusk');
+
+    expect(setting('theme'))->toBe('dusk');
+
+    $output = runInstallerThemeStep(['--theme' => 'atom']);
+
+    expect(WebsiteSetting::where('key', 'theme')->value('value'))->toBe('atom')
+        ->and(setting('theme'))->toBe('atom')
+        ->and($output)->toContain("Active theme set to 'atom'");
+});
+
+test('the installer warns about an unknown theme and keeps the current one', function () {
+    installHotel();
+    setSetting('theme', 'dusk');
+
+    $output = runInstallerThemeStep(['--theme' => 'missing']);
+
+    expect(WebsiteSetting::where('key', 'theme')->value('value'))->toBe('dusk')
+        ->and($output)->toContain("Unknown theme 'missing'", 'atom, dusk');
+});
+
+test('the installer replaces a stored theme that is not installed with the configured default', function () {
+    installHotel();
+    setSetting('theme', 'missing');
+
+    runInstallerThemeStep();
+
+    expect(WebsiteSetting::where('key', 'theme')->value('value'))->toBe(config('theme.default'));
+});
 
 test('the installer builds the selected theme and shared assets once in order', function (string $theme): void {
     installHotel();

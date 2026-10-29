@@ -89,3 +89,13 @@ test('a failed npm build returns failure', function (): void {
 
     Process::assertRan(fn (PendingProcess $process): bool => $process->command === ['npm', 'run', 'build:aurora']);
 });
+
+test('building requires source entrypoints even though production rendering does not', function (): void {
+    File::delete($this->buildThemeRoot . '/aurora/css/app.css');
+    Process::fake();
+
+    $this->artisan('build:theme', ['theme' => 'aurora'])
+        ->expectsOutput('Missing entrypoint file [css/app.css].')->assertFailed();
+
+    Process::assertNothingRan();
+});

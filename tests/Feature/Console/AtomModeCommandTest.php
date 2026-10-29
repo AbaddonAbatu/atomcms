@@ -20,13 +20,38 @@ test('mode status reports each owner manifest using the canonical theme target',
 
         app()->usePublicPath(base_path('tests/Fixtures/vite/missing'));
         expect(Artisan::call('atom:mode', ['--status' => true]))->toBe(0);
-        expect(Artisan::output())->toContain('missing: npm run build:atom', 'npm run build:atom', 'missing: npm run build:core', 'missing: npm run build:housekeeping')->not->toContain('build:1');
+        expect(Artisan::output())->toContain('not ready: Missing build manifest', 'npm run build:atom', 'missing: npm run build:core', 'missing: npm run build:housekeeping')->not->toContain('build:1');
     } finally {
         app()->usePublicPath($originalPublicPath);
         app()->useStoragePath($originalStoragePath);
         File::deleteDirectory($temporaryStoragePath);
     }
 })->with(['atom', '1', '']);
+
+test('mode status reports theme assets the production validator rejects', function (): void {
+    installHotel();
+    setSetting('theme', 'atom');
+    $originalPublicPath = public_path();
+    $originalStoragePath = storage_path();
+    $originalEnvironment = app()->environment();
+    $temporaryStoragePath = sys_get_temp_dir() . '/atom-mode-status-' . bin2hex(random_bytes(12));
+
+    try {
+        app()->usePublicPath(base_path('tests/Fixtures/vite/manifest'));
+        app()->useStoragePath($temporaryStoragePath);
+        File::ensureDirectoryExists(storage_path('vite'));
+        File::put(storage_path('vite/atom.hot'), 'http://localhost:5173');
+        app()->detectEnvironment(fn (): string => 'production');
+
+        expect(Artisan::call('atom:mode', ['--status' => true]))->toBe(0);
+        expect(Artisan::output())->toContain('not ready: Remove the development hot file');
+    } finally {
+        app()->detectEnvironment(fn (): string => $originalEnvironment);
+        app()->usePublicPath($originalPublicPath);
+        app()->useStoragePath($originalStoragePath);
+        File::deleteDirectory($temporaryStoragePath);
+    }
+});
 
 test('headless mode status works without public theme files', function (): void {
     installHotel();

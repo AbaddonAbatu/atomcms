@@ -1,8 +1,11 @@
 <?php
 
+use App\Console\Commands\AtomInstallCommand;
 use App\Contracts\PaypalGateway;
+use App\Emulator\EmulatorManager;
 use App\Exceptions\ThemePresentationException;
 use App\Filament\Resources\Atom\Articles\Pages\EditArticle;
+use App\Filament\Resources\Atom\CmsSettings\Pages\ManageCmsSettings;
 use App\Http\Middleware\SetThemeMiddleware;
 use App\Models\Articles\WebsiteArticle;
 use App\Models\Help\WebsiteHelpCenterCategory;
@@ -12,17 +15,29 @@ use App\Models\Shop\WebsitePaypalTransaction;
 use App\Models\User;
 use App\Providers\ThemeServiceProvider;
 use App\Services\InstallationService;
+use App\Services\InstallationSetup;
 use App\Services\SettingsService;
 use App\Services\ThemeService;
 use App\Services\ThemeValidator;
+use Filament\Actions\EditAction;
+use Filament\Actions\Testing\TestAction;
+use Filament\Facades\Filament;
+use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
+use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\ViewException;
 use Livewire\Livewire;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
@@ -81,6 +96,39 @@ function themeActivationStoreCmsSetting(string $key, string $value): void
     ]);
 }
 
+function themeActivationEditCmsSetting(string $key, string $value): void
+{
+    $record = WebsiteSetting::query()->where('key', $key)->firstOrFail();
+
+    Livewire::test(ManageCmsSettings::class)
+        ->callAction(TestAction::make(EditAction::class)->table($record), data: ['value' => $value]);
+}
+
+/**
+ * @param  array<string, mixed>  $options
+ */
+function themeActivationRunInstallStep(array $options = []): string
+{
+    $command = new class extends AtomInstallCommand
+    {
+        public function handle(EmulatorManager $emulators): int
+        {
+            (new ReflectionMethod(AtomInstallCommand::class, 'setUpTheme'))->invoke($this);
+
+            return self::SUCCESS;
+        }
+    };
+    $command->setLaravel(app());
+
+    $input = new ArrayInput(['--skip-build' => true, ...$options]);
+    $input->setInteractive(false);
+    $output = new BufferedOutput;
+
+    expect($command->run($input, $output))->toBe(0);
+
+    return $output->fetch();
+}
+
 function themeActivationSnapshot(string $html, string $component): string
 {
     preg_match_all('/wire:snapshot="([^"]+)"/', $html, $matches);
@@ -115,6 +163,76 @@ function themeActivationCompletedPaypalOrder(string $orderId): array
     ];
 }
 
+test('housekeeping activates a bundled theme when its fixture build is complete', function (): void {
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    grantHousekeepingPermission('manage_website_settings', 6);
+    $this->actingAs(User::factory()->create(['rank' => 6]));
+    Filament::setCurrentPanel(Filament::getPanel('housekeeping'));
+    themeActivationStoreCmsSetting('theme', 'atom');
+
+    themeActivationEditCmsSetting('theme', 'dusk');
+
+    expect(WebsiteSetting::where('key', 'theme')->value('value'))->toBe('dusk')
+        ->and(setting('theme'))->toBe('dusk');
+});
+
+test('housekeeping rejects an incomplete theme and keeps the stored setting', function (): void {
+    $root = $this->activationTemporaryPath . '/themes';
+    $theme = themeActivationWriteAurora($root);
+    File::delete($theme . '/views/banned.blade.php');
+    themeActivationUseBasePath($root);
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    grantHousekeepingPermission('manage_website_settings', 6);
+    $this->actingAs(User::factory()->create(['rank' => 6]));
+    Filament::setCurrentPanel(Filament::getPanel('housekeeping'));
+    themeActivationStoreCmsSetting('theme', 'atom');
+
+    $record = WebsiteSetting::query()->where('key', 'theme')->firstOrFail();
+    Livewire::test(ManageCmsSettings::class)
+        ->callAction(TestAction::make(EditAction::class)->table($record), data: ['value' => 'aurora'])
+        ->assertHasActionErrors(['value']);
+
+    expect(setting('theme'))->toBe('atom');
+});
+
+test('housekeeping rejects an unbuilt theme and an unknown ID without changing the stored setting', function (): void {
+    app()->usePublicPath($this->activationTemporaryPath . '/empty-public');
+    File::ensureDirectoryExists(public_path());
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    grantHousekeepingPermission('manage_website_settings', 6);
+    $this->actingAs(User::factory()->create(['rank' => 6]));
+    Filament::setCurrentPanel(Filament::getPanel('housekeeping'));
+    themeActivationStoreCmsSetting('theme', 'atom');
+
+    themeActivationEditCmsSetting('theme', 'dusk');
+    expect(setting('theme'))->toBe('atom');
+
+    themeActivationEditCmsSetting('theme', 'missing');
+    expect(setting('theme'))->toBe('atom');
+});
+
+test('housekeeping can activate a theme with missing decorative media', function (): void {
+    File::copyDirectory(public_path(), $this->activationTemporaryPath . '/public');
+    app()->usePublicPath($this->activationTemporaryPath . '/public');
+    $path = public_path('build/themes/dusk/manifest.json');
+    $manifest = File::json($path);
+    unset($manifest['resources/themes/dusk/images/ghost.png']);
+    File::put($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    grantHousekeepingPermission('manage_website_settings', 6);
+    $this->actingAs(User::factory()->create(['rank' => 6]));
+    Filament::setCurrentPanel(Filament::getPanel('housekeeping'));
+    $record = WebsiteSetting::query()->where('key', 'theme')->firstOrFail();
+    $record->update(['comment' => 'Media activation fixture']);
+
+    Livewire::test(ManageCmsSettings::class)
+        ->callAction(TestAction::make(EditAction::class)->table($record), data: ['value' => 'dusk'])
+        ->assertHasNoActionErrors();
+
+    expect($record->refresh()->value)->toBe('dusk');
+    expect(setting('theme'))->toBe('dusk');
+});
+
 test('a missing page template leaves unrelated pages and writes available', function (): void {
     $root = $this->activationTemporaryPath . '/themes';
     $theme = themeActivationWriteAurora($root);
@@ -133,6 +251,125 @@ test('a missing page template leaves unrelated pages and writes available', func
 
     expect($user->tickets()->count())->toBe(1);
 });
+
+test('production housekeeping rejects a leftover hot file', function (): void {
+    File::put(storage_path('vite/dusk.hot'), 'http://dusk-vite.test:5173');
+    app()->detectEnvironment(fn (): string => 'production');
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    grantHousekeepingPermission('manage_website_settings', 6);
+    $this->actingAs(User::factory()->create(['rank' => 6]));
+    Filament::setCurrentPanel(Filament::getPanel('housekeeping'));
+    themeActivationStoreCmsSetting('theme', 'atom');
+
+    themeActivationEditCmsSetting('theme', 'dusk');
+
+    expect(setting('theme'))->toBe('atom');
+});
+
+test('the installer rejects an incomplete or unbuilt theme without writing it', function (): void {
+    $root = $this->activationTemporaryPath . '/themes';
+    $theme = themeActivationWriteAurora($root);
+    File::delete($theme . '/views/banned.blade.php');
+    themeActivationUseBasePath($root);
+    themeActivationStoreCmsSetting('theme', 'atom');
+
+    expect(fn (): mixed => app(InstallationSetup::class)->configure(['theme' => 'aurora']))
+        ->toThrow(ValidationException::class);
+    expect(setting('theme'))->toBe('atom');
+
+    themeActivationUseBasePath(resource_path('themes'));
+    app()->usePublicPath($this->activationTemporaryPath . '/empty-public');
+    File::ensureDirectoryExists(public_path());
+
+    expect(fn (): mixed => app(InstallationSetup::class)->configure(['theme' => 'dusk']))
+        ->toThrow(ValidationException::class);
+    expect(setting('theme'))->toBe('atom');
+});
+
+test('atom:install activates a theme after a successful build', function (): void {
+    Process::fake(['*' => Process::result(output: 'built')]);
+    setSetting('theme', 'dusk');
+
+    $output = themeActivationRunInstallStep(['--theme' => 'atom', '--skip-build' => false]);
+
+    Process::assertRan(fn (PendingProcess $process): bool => $process->command === ['npm', 'run', 'build:atom']);
+    expect(setting('theme'))->toBe('atom')
+        ->and($output)->toContain("Active theme set to 'atom'");
+});
+
+test('atom:install keeps the current theme when the selected theme cannot be activated', function (): void {
+    Process::fake(['*' => Process::result(output: 'built')]);
+    app()->usePublicPath($this->activationTemporaryPath . '/empty-public');
+    File::ensureDirectoryExists(public_path());
+    setSetting('theme', 'dusk');
+
+    $output = themeActivationRunInstallStep(['--theme' => 'atom', '--skip-build' => false]);
+
+    expect(setting('theme'))->toBe('dusk')
+        ->and($output)->toContain("Theme 'atom' cannot be activated yet", 'Missing build manifest');
+});
+
+test('atom:install --skip-build activates a complete theme and defers only its build', function (): void {
+    app()->usePublicPath($this->activationTemporaryPath . '/empty-public');
+    File::ensureDirectoryExists(public_path());
+    setSetting('theme', 'dusk');
+
+    $output = themeActivationRunInstallStep(['--theme' => 'atom']);
+
+    expect(setting('theme'))->toBe('atom')
+        ->and($output)->toContain('npm run build:atom', "Active theme set to 'atom'. Build its assets before serving the site.");
+});
+
+test('atom:install --skip-build still refuses a theme with missing views', function (): void {
+    $root = $this->activationTemporaryPath . '/themes';
+    $theme = themeActivationWriteAurora($root);
+    File::delete($theme . '/views/banned.blade.php');
+    themeActivationUseBasePath($root);
+    app()->usePublicPath($this->activationTemporaryPath . '/empty-public');
+    File::ensureDirectoryExists(public_path());
+    themeActivationStoreCmsSetting('theme', 'atom');
+
+    $output = themeActivationRunInstallStep(['--theme' => 'aurora']);
+
+    expect(setting('theme'))->toBe('atom')
+        ->and($output)->toContain("Theme 'aurora' cannot be activated yet", 'Missing view [banned]')
+        ->not->toContain('Missing build manifest');
+});
+
+test('validated theme writes reach another persistent application in either lifecycle order', function (string $first, string $second): void {
+    setSetting('theme', $first);
+    $secondApplication = $this->createApplication();
+
+    try {
+        Container::setInstance($this->app);
+        Facade::setFacadeApplication($this->app);
+        Facade::clearResolvedInstances();
+        Model::setConnectionResolver($this->app['db']);
+        Model::setEventDispatcher($this->app['events']);
+        $pdo = $this->app['db']->connection()->getPdo();
+        $secondApplication['db']->connection()->setPdo($pdo)->setReadPdo($pdo);
+
+        expect($secondApplication->make(SettingsService::class)->getOrDefault('theme'))->toBe($first);
+        app(InstallationSetup::class)->configure(['theme' => $second]);
+
+        Container::setInstance($secondApplication);
+        Facade::setFacadeApplication($secondApplication);
+        Facade::clearResolvedInstances();
+        $secondApplication->forgetScopedInstances();
+
+        expect($secondApplication->make(SettingsService::class)->getOrDefault('theme'))->toBe($second)
+            ->and(realpath(theme_view('index')->getPath()))
+            ->toBe(realpath(resource_path("themes/{$second}/views/index.blade.php")));
+    } finally {
+        Container::setInstance($this->app);
+        Facade::setFacadeApplication($this->app);
+        Facade::clearResolvedInstances();
+        $secondApplication->flush();
+    }
+})->with([
+    'atom then dusk' => ['atom', 'dusk'],
+    'dusk then atom' => ['dusk', 'atom'],
+]);
 
 test('invalid externally written theme settings return the Core 503 diagnostic without assets', function (string $kind): void {
     if ($kind === 'rejected') {

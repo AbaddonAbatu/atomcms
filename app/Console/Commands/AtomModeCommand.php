@@ -7,6 +7,7 @@ use App\Exceptions\ThemePresentationException;
 use App\Services\InstallationService;
 use App\Services\OperatingMode;
 use App\Services\ThemeService;
+use App\Services\ThemeValidator;
 use App\Support\EnvironmentFile;
 use Dotenv\Dotenv;
 use Illuminate\Console\Command;
@@ -116,8 +117,10 @@ class AtomModeCommand extends Command
             return 'unavailable: ' . $exception->getMessage();
         }
 
-        return is_file(public_path($theme->buildDirectory() . '/manifest.json'))
+        $problems = app(ThemeValidator::class)->assetProblems($theme, app()->isProduction());
+
+        return $problems === []
             ? 'ready'
-            : "missing: npm run build:{$theme->id}";
+            : 'not ready: ' . implode(' ', $problems) . " Build with npm run build:{$theme->id}.";
     }
 }
