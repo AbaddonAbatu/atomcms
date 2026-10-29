@@ -3,11 +3,15 @@
     "type": "module",
     "scripts": {
         "dev:atom": "vite --config resources/themes/atom/vite.config.js",
-        "build:atom": "vite build --config resources/themes/atom/vite.config.js && npm run build:housekeeping",
+        "build:atom": "vite build --config resources/themes/atom/vite.config.js",
         "dev:dusk": "vite --config resources/themes/dusk/vite.config.js",
-        "build:dusk": "vite build --config resources/themes/dusk/vite.config.js && npm run build:housekeeping",
+        "build:dusk": "vite build --config resources/themes/dusk/vite.config.js",
+        "build:core": "vite build",
+        "dev:core": "vite",
+        "dev:housekeeping": "vite --config resources/css/filament/housekeeping/vite.config.js",
         "format": "prettier \"resources/**/*.{js,ts,vue,blade}\" --write",
         "build:housekeeping": "vite build --config resources/css/filament/housekeeping/vite.config.js",
+        "build:all": "npm run build:atom && npm run build:dusk && npm run build:core && npm run build:housekeeping",
         "api:generate": "node scripts/api/generate.mjs",
         "api:check": "node scripts/api/generate.mjs --check && node scripts/api/check.mjs",
         "api:test": "node --test scripts/api/contract.test.mjs"

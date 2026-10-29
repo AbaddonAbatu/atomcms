@@ -1,0 +1,52 @@
+{
+  "resources/themes/atom/css/app.css": {
+    "file": "assets/atom-app-fixture.css",
+    "src": "resources/themes/atom/css/app.css",
+    "isEntry": true
+  },
+  "resources/themes/atom/js/app.js": {
+    "file": "assets/atom-app-fixture.js",
+    "src": "resources/themes/atom/js/app.js",
+    "isEntry": true
+  },
+  "resources/themes/atom/images/hotel.png": {
+    "file": "assets/atom-hotel-fixture.png",
+    "src": "resources/themes/atom/images/hotel.png"
+  },
+  "resources/themes/atom/images/angry_frank.png": {
+    "file": "assets/atom-angry_frank-fixture.png",
+    "src": "resources/themes/atom/images/angry_frank.png"
+  },
+  "resources/themes/atom/images/background-light.jpg": {
+    "file": "assets/atom-background-light-fixture.jpg",
+    "src": "resources/themes/atom/images/background-light.jpg"
+  },
+  "resources/themes/atom/images/background-dark.jpg": {
+    "file": "assets/atom-background-dark-fixture.jpg",
+    "src": "resources/themes/atom/images/background-dark.jpg"
+  },
+  "resources/themes/atom/images/profile/profile-bg.png": {
+    "file": "assets/atom-profile-bg-fixture.png",
+    "src": "resources/themes/atom/images/profile/profile-bg.png"
+  },
+  "resources/themes/atom/images/icons/navigation/shop.png": {
+    "file": "assets/atom-shop-fixture.png",
+    "src": "resources/themes/atom/images/icons/navigation/shop.png"
+  },
+  "resources/themes/atom/images/icons/navigation/leaderboards.png": {
+    "file": "assets/atom-leaderboards-fixture.png",
+    "src": "resources/themes/atom/images/icons/navigation/leaderboards.png"
+  },
+  "resources/themes/atom/images/icons/navigation/rules.gif": {
+    "file": "assets/atom-rules-fixture.gif",
+    "src": "resources/themes/atom/images/icons/navigation/rules.gif"
+  },
+  "resources/themes/atom/images/icons/navigation/home.png": {
+    "file": "assets/atom-home-fixture.png",
+    "src": "resources/themes/atom/images/icons/navigation/home.png"
+  },
+  "resources/themes/atom/images/icons/navigation/community.png": {
+    "file": "assets/atom-community-fixture.png",
+    "src": "resources/themes/atom/images/icons/navigation/community.png"
+  }
+}

@@ -95,7 +95,7 @@ test('Atom renders an active member ban with its details and themed illustration
 
     $this->actingAs($member)->get(route('banned.show'))
         ->assertSee(['Ban type:</strong> account', 'Spamming the lobby'], false)
-        ->assertSee('/assets/images/angry_frank.png', false);
+        ->assertDontSee('/assets/images/angry_frank.png', false);
 });
 
 test('Atom renders teams with their members', function (): void {

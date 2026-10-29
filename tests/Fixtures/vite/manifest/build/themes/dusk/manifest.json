@@ -1,0 +1,68 @@
+{
+  "resources/themes/dusk/css/app.css": {
+    "file": "assets/dusk-app-fixture.css",
+    "src": "resources/themes/dusk/css/app.css",
+    "isEntry": true
+  },
+  "resources/themes/dusk/js/app.js": {
+    "file": "assets/dusk-app-fixture.js",
+    "src": "resources/themes/dusk/js/app.js",
+    "isEntry": true
+  },
+  "resources/themes/dusk/images/background_image.png": {
+    "file": "assets/dusk-background_image-fixture.png",
+    "src": "resources/themes/dusk/images/background_image.png"
+  },
+  "resources/themes/dusk/images/icons/navigation/shop.png": {
+    "file": "assets/dusk-shop-fixture.png",
+    "src": "resources/themes/dusk/images/icons/navigation/shop.png"
+  },
+  "resources/themes/dusk/images/leaderboard_circle_image.png": {
+    "file": "assets/dusk-leaderboard_circle_image-fixture.png",
+    "src": "resources/themes/dusk/images/leaderboard_circle_image.png"
+  },
+  "resources/themes/dusk/images/icons/navigation/leaderboards.png": {
+    "file": "assets/dusk-leaderboards-fixture.png",
+    "src": "resources/themes/dusk/images/icons/navigation/leaderboards.png"
+  },
+  "resources/themes/dusk/images/icons/navigation/rules.png": {
+    "file": "assets/dusk-rules-fixture.png",
+    "src": "resources/themes/dusk/images/icons/navigation/rules.png"
+  },
+  "resources/themes/dusk/images/ghost.png": {
+    "file": "assets/dusk-ghost-fixture.png",
+    "src": "resources/themes/dusk/images/ghost.png"
+  },
+  "resources/themes/dusk/images/angry_frank.png": {
+    "file": "assets/dusk-angry_frank-fixture.png",
+    "src": "resources/themes/dusk/images/angry_frank.png"
+  },
+  "resources/themes/dusk/images/icons/author_camera_icon.png": {
+    "file": "assets/dusk-author_camera_icon-fixture.png",
+    "src": "resources/themes/dusk/images/icons/author_camera_icon.png"
+  },
+  "resources/themes/dusk/images/profile/me_circle_image.png": {
+    "file": "assets/dusk-me_circle_image-fixture.png",
+    "src": "resources/themes/dusk/images/profile/me_circle_image.png"
+  },
+  "resources/themes/dusk/images/icons/exclamation-mark_icon.png": {
+    "file": "assets/dusk-exclamation-mark_icon-fixture.png",
+    "src": "resources/themes/dusk/images/icons/exclamation-mark_icon.png"
+  },
+  "resources/themes/dusk/images/icons/camera_icon.png": {
+    "file": "assets/dusk-camera_icon-fixture.png",
+    "src": "resources/themes/dusk/images/icons/camera_icon.png"
+  },
+  "resources/themes/dusk/images/icons/navigation/news.png": {
+    "file": "assets/dusk-news-fixture.png",
+    "src": "resources/themes/dusk/images/icons/navigation/news.png"
+  },
+  "resources/themes/dusk/images/icons/navigation/community.png": {
+    "file": "assets/dusk-community-fixture.png",
+    "src": "resources/themes/dusk/images/icons/navigation/community.png"
+  },
+  "resources/themes/dusk/images/icons/navigation/home.png": {
+    "file": "assets/dusk-home-fixture.png",
+    "src": "resources/themes/dusk/images/icons/navigation/home.png"
+  }
+}

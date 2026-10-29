@@ -2,26 +2,21 @@
 
 namespace App\Console\Commands;
 
+use App\Services\ThemeValidator;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Process;
+use Throwable;
 
 class BuildTheme extends Command
 {
-    protected $signature = 'build:theme {theme? : Theme name, or housekeeping for standalone admin assets}';
+    protected $signature = 'build:theme {theme? : Theme ID, core or housekeeping}';
 
     protected $description = 'Build a selected theme assets';
 
-    public function handle(): int
+    public function handle(ThemeValidator $validator): int
     {
-        $themes = $this->getAvailableThemes();
-
-        if ($themes->isEmpty()) {
-            $this->error('No themes found in resources/themes/');
-
-            return Command::FAILURE;
-        }
+        $themes = collect(array_keys($validator->definitions()))->push('core', 'housekeeping')->sort()->values();
 
         $selection = $this->argument('theme') ?? $this->choice(
             'Which theme would you like to build?',
@@ -35,8 +30,34 @@ class BuildTheme extends Command
             return Command::FAILURE;
         }
 
+        if (isset($validator->rejected()[$selection]) && ! in_array($selection, ['core', 'housekeeping'], true)) {
+            $this->error("Theme {$selection} is rejected.");
+
+            foreach ($validator->rejected()[$selection] as $problem) {
+                $this->line($problem);
+            }
+
+            return Command::FAILURE;
+        }
+
         if (! $themes->contains($selection)) {
             $this->error('Unknown theme. Available: ' . $themes->implode(', '));
+
+            return Command::FAILURE;
+        }
+
+        try {
+            $package = File::json(base_path('package.json'));
+        } catch (Throwable $exception) {
+            $this->error('Cannot read package.json: ' . $exception->getMessage());
+
+            return Command::FAILURE;
+        }
+
+        $script = $package['scripts']["build:{$selection}"] ?? null;
+
+        if (! is_string($script) || trim($script) === '') {
+            $this->error("Missing npm script [build:{$selection}] in package.json. Add it before building this target.");
 
             return Command::FAILURE;
         }
@@ -46,28 +67,14 @@ class BuildTheme extends Command
         return $this->runBuildCommand($selection);
     }
 
-    /** @return Collection<int, string> */
-    private function getAvailableThemes(): Collection
-    {
-        $themesPath = resource_path('themes');
-
-        if (! File::exists($themesPath)) {
-            return collect();
-        }
-
-        return collect(File::directories($themesPath))
-            ->map(fn ($path) => basename($path))
-            ->push('housekeeping')
-            ->sort();
-    }
-
     private function runBuildCommand(string $theme): int
     {
-        $process = new Process(['npm', 'run', "build:{$theme}"], base_path());
-        $process->setTimeout(300);
-        $process->run(fn (string $type, string $buffer) => $this->output->write($buffer));
+        $process = Process::path(base_path())->timeout(300)->run(
+            ['npm', 'run', "build:{$theme}"],
+            fn (string $type, string $buffer) => $this->output->write($buffer),
+        );
 
-        if ($process->isSuccessful()) {
+        if ($process->successful()) {
             $this->info("Theme {$theme} built successfully!");
 
             return Command::SUCCESS;

@@ -132,7 +132,7 @@
                 </div>
 
                 <div class="hidden md:block relative w-full">
-                    <img class="opacity-50 absolute -right-3 -bottom-3" src="{{ asset('/assets/images/hotel.png') }}"
+                    <img class="opacity-50 absolute -right-3 -bottom-3" src="{{ theme_asset('images/hotel.png') }}"
                          alt="">
                 </div>
             </div>

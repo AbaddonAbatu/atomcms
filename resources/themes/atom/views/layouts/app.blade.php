@@ -20,7 +20,7 @@
 
     @livewireStyles
     @livewireScriptConfig
-    @vite(['resources/themes/atom/css/app.css', 'resources/themes/atom/js/app.js'], 'build')
+    {{ theme_vite() }}
     @stack('scripts')
     <x-turnstile.scripts />
 </head>

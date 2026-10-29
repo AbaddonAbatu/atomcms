@@ -4,15 +4,17 @@ import path from "path";
 import tailwindcss from "@tailwindcss/postcss";
 import autoprefixer from "autoprefixer";
 
+const themeId = path.basename(__dirname);
+
 export default defineConfig({
     plugins: [
         laravel({
             input: [
                 path.resolve(__dirname, "css/app.css"),
                 path.resolve(__dirname, "js/app.js"),
-                "resources/js/global.js",
-                "resources/css/global.css",
             ],
+            buildDirectory: `build/themes/${themeId}`,
+            hotFile: `storage/vite/${themeId}.hot`,
         }),
 
         {

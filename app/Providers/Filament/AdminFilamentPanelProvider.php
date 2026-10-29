@@ -13,14 +13,17 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Assets\Theme;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Foundation\Vite;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminFilamentPanelProvider extends PanelProvider
@@ -34,7 +37,8 @@ class AdminFilamentPanelProvider extends PanelProvider
             ->strictAuthorization()
             ->login(Login::class)
             ->multiFactorAuthentication(app(FortifyTwoFactorAuthentication::class))
-            ->viteTheme('resources/css/filament/housekeeping/theme.css', 'build-housekeeping')
+            ->theme(Theme::make('app')->html(fn (): HtmlString => app(Vite::class)
+                ->useHotFile(storage_path('vite/housekeeping.hot'))(['resources/css/filament/housekeeping/theme.css'], 'build-housekeeping')))
             ->colors([
                 'primary' => Color::Amber,
             ])

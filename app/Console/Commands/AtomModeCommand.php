@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\ReadsStringInputs;
+use App\Exceptions\ThemePresentationException;
 use App\Services\InstallationService;
 use App\Services\OperatingMode;
+use App\Services\ThemeService;
 use App\Support\EnvironmentFile;
 use Dotenv\Dotenv;
 use Illuminate\Console\Command;
@@ -23,7 +25,7 @@ class AtomModeCommand extends Command
 
     protected $description = 'Configure the public presentation without changing hotel data';
 
-    public function handle(OperatingMode $modes, EnvironmentFile $environment, InstallationService $installation): int
+    public function handle(OperatingMode $modes, EnvironmentFile $environment, InstallationService $installation, ThemeService $themes): int
     {
         if ($this->option('status') || $this->argument('mode') === null) {
             $this->table(['Setting', 'Value'], [
@@ -31,6 +33,8 @@ class AtomModeCommand extends Command
                 ['Backend', config('app.url')],
                 ['Frontend', config('atom.frontend_url') ?: '(built-in theme)'],
                 ['Installation', $installation->isComplete() ? 'complete' : 'incomplete'],
+                ['Theme assets', $this->themeAssetStatus($themes, config('atom.mode'))],
+                ['Core assets', is_file(public_path('build-core/manifest.json')) ? 'ready' : 'missing: npm run build:core'],
                 ['Housekeeping assets', is_file(public_path('build-housekeeping/manifest.json')) ? 'ready' : 'missing: npm run build:housekeeping'],
             ]);
 
@@ -82,8 +86,11 @@ class AtomModeCommand extends Command
                 throw $exception;
             }
             $this->info('Configuration saved. Restart queue workers and persistent application servers through your deployment process.');
-            if ($values['ATOM_MODE'] === 'full' && ! is_file(public_path('build/manifest.json'))) {
-                $this->warn('Public assets are missing. Run npm run build:' . (setting('theme') ?: 'atom'));
+            if ($values['ATOM_MODE'] === 'full' && ($themeAssets = $this->themeAssetStatus($themes, $values['ATOM_MODE'])) !== 'ready') {
+                $this->warn('Public theme assets: ' . $themeAssets);
+            }
+            if (! is_file(public_path('build-core/manifest.json'))) {
+                $this->warn('Core assets are missing. Run npm run build:core.');
             }
             if (! is_file(public_path('build-housekeeping/manifest.json'))) {
                 $this->warn('Housekeeping assets are missing. Run npm run build:housekeeping.');
@@ -95,5 +102,22 @@ class AtomModeCommand extends Command
 
             return self::FAILURE;
         }
+    }
+
+    private function themeAssetStatus(ThemeService $themes, string $mode): string
+    {
+        if ($mode === 'headless') {
+            return 'not required (headless)';
+        }
+
+        try {
+            $theme = $themes->selected();
+        } catch (ThemePresentationException $exception) {
+            return 'unavailable: ' . $exception->getMessage();
+        }
+
+        return is_file(public_path($theme->buildDirectory() . '/manifest.json'))
+            ? 'ready'
+            : "missing: npm run build:{$theme->id}";
     }
 }

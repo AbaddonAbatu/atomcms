@@ -5,9 +5,11 @@ use App\Models\User;
 use App\Providers\ThemeServiceProvider;
 use App\Services\ThemeService;
 use App\Services\ThemeValidator;
+use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\HtmlString;
 use Livewire\Blaze\Blaze;
 
 /**
@@ -281,3 +283,81 @@ test('an invalid inactive candidate does not break provider boot or legacy pages
     expect(realpath(view()->getFinder()->find('theme-atom::index')))
         ->toBe(realpath(resource_path('themes/atom/views/index.blade.php')));
 });
+
+test('theme Vite uses its own manifest and preserves shared instance configuration', function () {
+    installHotel();
+    setSetting('theme', 'atom');
+    $this->withVite();
+    app()->forgetInstance(Vite::class);
+    app()->usePublicPath($this->resolutionTemporaryPath . '/public');
+    app()->useStoragePath($this->resolutionTemporaryPath . '/storage');
+    File::ensureDirectoryExists(public_path('build/themes/atom'));
+    File::put(public_path('build/themes/atom/manifest.json'), json_encode([
+        'resources/themes/atom/css/app.css' => ['file' => 'assets/atom-fixture.css', 'src' => 'resources/themes/atom/css/app.css', 'isEntry' => true],
+        'resources/themes/atom/js/app.js' => ['file' => 'assets/atom-fixture.js', 'src' => 'resources/themes/atom/js/app.js', 'isEntry' => true],
+        'resources/themes/atom/images/fixture.png' => ['file' => 'assets/fixture-hashed.png'],
+    ], JSON_THROW_ON_ERROR));
+    $shared = app(Vite::class);
+    app()->instance(Vite::class, $shared);
+
+    $tags = theme_vite();
+
+    expect($tags)->toBeInstanceOf(HtmlString::class);
+    expect($tags->toHtml())->toContain(
+        '<link rel="stylesheet" href="http://localhost/build/themes/atom/assets/atom-fixture.css"',
+        '<script type="module" src="http://localhost/build/themes/atom/assets/atom-fixture.js" data-turbolinks-eval="false"></script>',
+    )->not->toContain('dusk');
+    expect(theme_asset('images/fixture.png'))->toBe('http://localhost/build/themes/atom/assets/fixture-hashed.png');
+    expect(app(Vite::class))->toBe($shared);
+    expect(preg_replace('~/+~', '/', str_replace('\\', '/', $shared->hotFile())))
+        ->toBe(str_replace('\\', '/', storage_path('vite/core.hot')));
+    expect((string) $shared(['resources/themes/atom/css/app.css'], 'build/themes/atom'))
+        ->toContain('/build/themes/atom/assets/atom-fixture.css');
+});
+
+test('theme Vite resolves call time swaps and the selected theme hot server', function () {
+    installHotel();
+    setSetting('theme', 'dusk');
+    app()->usePublicPath($this->resolutionTemporaryPath . '/public');
+    app()->useStoragePath($this->resolutionTemporaryPath . '/storage');
+    File::ensureDirectoryExists(storage_path('vite'));
+    File::put(storage_path('vite/dusk.hot'), 'http://dusk-vite.test:5173');
+
+    expect(theme_vite()->toHtml())->toBe('');
+    $this->withVite();
+    app()->forgetInstance(Vite::class);
+    $shared = app(Vite::class);
+    app()->instance(Vite::class, $shared);
+
+    expect(theme_vite()->toHtml())->toContain(
+        'http://dusk-vite.test:5173/@vite/client',
+        'http://dusk-vite.test:5173/resources/themes/dusk/css/app.css',
+        'http://dusk-vite.test:5173/resources/themes/dusk/js/app.js',
+    )->not->toContain('resources/themes/atom/', '/build/');
+    expect(preg_replace('~/+~', '/', str_replace('\\', '/', $shared->hotFile())))
+        ->toBe(str_replace('\\', '/', storage_path('vite/core.hot')));
+    expect(theme_asset('images/fixture.png'))->toBe('http://dusk-vite.test:5173/resources/themes/dusk/images/fixture.png');
+
+    $this->withoutVite();
+    expect(theme_vite()->toHtml())->toBe('');
+});
+
+test('theme assets reject non-normalized paths before accessing Vite', function (string $path) {
+    installHotel();
+    setSetting('theme', 'atom');
+
+    expect(fn () => theme_asset($path))->toThrow(
+        ThemePresentationException::class,
+        "Theme [atom] asset path [{$path}] must be a normalized relative path inside the theme.",
+    );
+})->with([
+    'traversal' => '../dusk/images/x.png',
+    'absolute' => '/etc/passwd',
+    'Windows drive' => 'C:/x.png',
+    'backslash' => 'images\\x.png',
+    'dot segment' => './images/x.png',
+    'empty' => '',
+    'empty segment' => 'images//x.png',
+    'trailing slash' => 'images/x.png/',
+    'null byte' => "images/x.png\0",
+]);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Data\ThemeDefinition;
 use App\Exceptions\ThemePresentationException;
 use App\Mail\ResetPasswordMail;
 use App\Models\Articles\WebsiteArticle;
@@ -22,6 +23,7 @@ use App\Services\Auth\AuthPageService;
 use App\Services\SettingsService;
 use App\Services\ThemeService;
 use App\Services\ThemeValidator;
+use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -59,6 +61,8 @@ beforeEach(function (): void {
     app()->useStoragePath($this->auroraStoragePath);
     auroraRegisterThemeRuntime($this->auroraEmptyPath, $this->auroraEmptyPath);
 
+    $definition = app(ThemeValidator::class)->definition('aurora');
+    auroraWriteThemeManifest($definition);
     auroraStoreThemeSetting('aurora');
 });
 
@@ -105,6 +109,24 @@ function auroraRegisterThemeRuntime(string $atomPath, string $duskPath): void
     View::getFinder()->replaceNamespace('theme-atom', [$atomPath]);
     View::getFinder()->replaceNamespace('theme-dusk', [$duskPath]);
     View::getFinder()->flush();
+}
+
+function auroraWriteThemeManifest(ThemeDefinition $definition): void
+{
+    $assets = [];
+
+    foreach ($definition->viteEntrypoints() as $entrypoint) {
+        $extension = pathinfo($entrypoint, PATHINFO_EXTENSION);
+        $file = "assets/aurora-app.{$extension}";
+        File::ensureDirectoryExists(public_path($definition->buildDirectory() . '/assets'));
+        File::put(public_path($definition->buildDirectory() . '/' . $file), 'aurora fixture asset');
+        $assets[$entrypoint] = ['file' => $file, 'src' => $entrypoint, 'isEntry' => true];
+    }
+
+    File::put(
+        public_path($definition->buildDirectory() . '/manifest.json'),
+        json_encode($assets, JSON_THROW_ON_ERROR),
+    );
 }
 
 function auroraAssertResolvedPaths(string $themeRoot): int
@@ -693,6 +715,19 @@ test('Aurora Livewire article updates use the shared endpoint and preserve Auror
     expect($open->json('components.0.effects.html'))->toContain('<dialog open aria-label="Add reaction">');
     $close = $this->postJson(Livewire::getUpdateUri(), ['components' => [['snapshot' => $open->json('components.0.snapshot'), 'updates' => [], 'calls' => [['method' => 'closeModal', 'params' => []]]]]], ['X-Livewire' => 'true'])->assertOk();
     expect($close->json('components.0.effects.html'))->not->toContain('<dialog open aria-label="Add reaction">');
+});
+
+test('Aurora production assets are selected exclusively and missing assets return Core 503', function (): void {
+    $this->withVite();
+    app()->forgetInstance(Vite::class);
+    $this->get(route('welcome'))->assertOk()->assertSee('/build/themes/aurora/')->assertDontSee('/build/themes/atom')->assertDontSee('/build/themes/dusk');
+
+    $missingPublicPath = $this->auroraTemporaryPath . '/missing-public';
+    File::ensureDirectoryExists($missingPublicPath);
+    app()->usePublicPath($missingPublicPath);
+    app()->forgetInstance(ThemeService::class);
+    app()->forgetScopedInstances();
+    $this->get(route('welcome'))->assertServiceUnavailable()->assertSee('Service Unavailable');
 });
 
 test('Aurora cannot fall back to a root collision when its required view is missing', function (): void {

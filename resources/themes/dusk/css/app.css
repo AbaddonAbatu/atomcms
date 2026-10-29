@@ -1,7 +1,13 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../../../../node_modules/flowbite";
+@source "../views";
+@source "../js";
+@source "../../../js/components/HomeManager.js";
+
+@source "../../../views/vendor/turnstile";
+
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
@@ -58,7 +64,7 @@ img {
     position: absolute;
     width: 100%;
     height: 400px;
-    background: url("/public/assets/images/dusk/background_image.png") no-repeat;
+    background: url("../images/background_image.png") no-repeat;
     background-size: cover;
     -webkit-mask-image: linear-gradient(to top, transparent, black);
     mask-image: linear-gradient(to top, transparent, black);
@@ -182,7 +188,7 @@ img {
 }
 
 .currency-icon {
-    background: url("/public/assets/images/dusk/store_icon.png") no-repeat center;
+    background: url("../images/icons/navigation/shop.png") no-repeat center;
 }
 
 .catalog-icon {
@@ -251,7 +257,7 @@ img {
 }
 
 .leaderboard-background {
-    background-image: url("/public/assets/images/dusk/leaderboard_circle_image.png");
+    background-image: url("../images/leaderboard_circle_image.png");
 }
 
 .staff-bg {

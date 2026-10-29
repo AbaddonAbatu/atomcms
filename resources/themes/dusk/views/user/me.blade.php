@@ -13,7 +13,7 @@
         </div>
 
         <div class="z-10">
-            <div class="hidden lg:block h-[200px] w-[200px] rounded-full relative overflow-hidden" style="background: url('{{ asset('/assets/images/dusk/me_circle_image.png') }}')">
+            <div class="hidden lg:block h-[200px] w-[200px] rounded-full relative overflow-hidden" style="background: url('{{ theme_asset('images/profile/me_circle_image.png') }}')">
                 <div>
                     <a href="{{ route('home.show', $user) }}"
                        class="absolute -bottom-12 left-2 lg:left-8 drop-shadow transition duration-300 ease-in-out hover:scale-105">

@@ -12,7 +12,7 @@
 
     @livewireStyles
     @livewireScriptConfig
-    @vite(['resources/themes/dusk/css/app.css', 'resources/themes/dusk/js/app.js'], 'build')
+    {{ theme_vite() }}
 </head>
 
 <body class="overflow-hidden" id="nitro-client">

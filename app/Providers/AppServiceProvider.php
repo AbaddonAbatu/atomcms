@@ -48,7 +48,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(
             Vite::class,
-            ViteService::class,
+            fn (): ViteService => (new ViteService)
+                ->useBuildDirectory('build-core')
+                ->useHotFile(storage_path('vite/core.hot')),
         );
 
         $this->app->singleton(InstallationService::class);

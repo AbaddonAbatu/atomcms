@@ -35,7 +35,7 @@ class AtomInstallCommand extends Command
         {--fresh : Drop every table in the target database before importing (destroys existing data)}
         {--skip-arcturus : Skip importing the bundled Arcturus base database and catalog}
         {--skip-catalog : Skip importing the bundled catalog on top of the base database}
-        {--theme= : Theme to activate and build (atom or dusk)}
+        {--theme= : Installed theme ID to activate and build}
         {--skip-build : Skip building required assets}
         {--headless : Install without a public PHP theme}
         {--frontend-url= : Origin of the independent frontend}
@@ -394,24 +394,23 @@ class AtomInstallCommand extends Command
         info("Active theme set to '{$theme}'.");
 
         if ($this->option('skip-build')) {
-            note('Skipping the asset build - run this yourself: npm run build:' . $theme);
+            note('Skipping the asset build - run these yourself: npm run build:' . $theme . ', npm run build:core, and npm run build:housekeeping.');
+        } else {
+            foreach ([$theme, 'core', 'housekeeping'] as $buildTarget) {
+                $result = spin(
+                    fn () => Process::timeout(600)->path(base_path())->run(['npm', 'run', "build:{$buildTarget}"]),
+                    "Building {$buildTarget} assets (npm run build:{$buildTarget})...",
+                );
 
-            return;
+                if ($result->failed()) {
+                    warning("The {$buildTarget} asset build failed - fix the error below and re-run: npm run build:{$buildTarget}");
+                    $this->line(trim($result->errorOutput() ?: $result->output()));
+                } else {
+                    info(ucfirst($buildTarget) . ' assets built.');
+                }
+            }
         }
 
-        $result = spin(
-            fn () => Process::timeout(600)->path(base_path())->run(['npm', 'run', "build:{$theme}"]),
-            "Building {$theme} theme assets (npm run build:{$theme})...",
-        );
-
-        if ($result->failed()) {
-            warning("The asset build failed - fix the error below and re-run: npm run build:{$theme}");
-            $this->line(trim($result->errorOutput() ?: $result->output()));
-
-            return;
-        }
-
-        info(ucfirst($theme) . ' theme assets built.');
     }
 
     private function linkStorage(): void

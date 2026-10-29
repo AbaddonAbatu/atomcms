@@ -5,7 +5,23 @@ use App\Models\Miscellaneous\WebsiteSetting;
 use App\Services\InstallationService;
 use App\Services\SettingsService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ViewErrorBag;
+
+beforeEach(function (): void {
+    $this->installationOriginalPublicPath = public_path();
+    $this->installationOriginalStoragePath = storage_path();
+    $this->installationTemporaryPath = sys_get_temp_dir() . '/atom-installation-' . bin2hex(random_bytes(12));
+    app()->usePublicPath(base_path('tests/Fixtures/vite/manifest'));
+    app()->useStoragePath($this->installationTemporaryPath);
+    File::ensureDirectoryExists(storage_path('vite'));
+});
+
+afterEach(function (): void {
+    app()->usePublicPath($this->installationOriginalPublicPath);
+    app()->useStoragePath($this->installationOriginalStoragePath);
+    File::deleteDirectory($this->installationTemporaryPath);
+});
 
 /**
  * Puts the hotel into a fresh, not-yet-installed state. The test database
