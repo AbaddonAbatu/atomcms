@@ -108,7 +108,7 @@
     >
     @endif
         @if(isset($icon))
-            <img @class(['icon', 'hidden lg:block' => $responsive]) src="{{ asset('/assets/images/' . $icon) }}" alt="">
+            <img @class(['icon', 'hidden lg:block' => $responsive]) src="{{ asset('/assets/images/dusk/' . $icon) }}" alt="">
         @endif
 
         {{ $slot }}

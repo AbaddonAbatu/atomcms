@@ -1,8 +1,6 @@
 <?php
 
-use App\Console\Commands\AtomInstallCommand;
 use App\Contracts\PaypalGateway;
-use App\Emulator\EmulatorManager;
 use App\Exceptions\ThemePresentationException;
 use App\Filament\Resources\Atom\Articles\Pages\EditArticle;
 use App\Http\Middleware\SetThemeMiddleware;
@@ -24,8 +22,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\ViewException;
 use Livewire\Livewire;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
@@ -65,6 +61,14 @@ function themeActivationUseBasePath(string $path): void
     app()->register(ThemeServiceProvider::class, true);
 }
 
+function themeActivationWriteAurora(string $root, string $id = 'aurora'): string
+{
+    $path = $root . '/' . $id;
+    File::copyDirectory(base_path('tests/Fixtures/themes/aurora'), $path);
+
+    return $path;
+}
+
 function themeActivationStoreCmsSetting(string $key, string $value): void
 {
     WebsiteSetting::query()->updateOrCreate([
@@ -73,31 +77,6 @@ function themeActivationStoreCmsSetting(string $key, string $value): void
         'value' => $value,
         'comment' => 'Activation fixture',
     ]);
-}
-
-/**
- * @param  array<string, mixed>  $options
- */
-function themeActivationRunInstallStep(array $options = []): string
-{
-    $command = new class extends AtomInstallCommand
-    {
-        public function handle(EmulatorManager $emulators): int
-        {
-            (new ReflectionMethod(AtomInstallCommand::class, 'setUpTheme'))->invoke($this);
-
-            return self::SUCCESS;
-        }
-    };
-    $command->setLaravel(app());
-
-    $input = new ArrayInput(['--skip-build' => true, ...$options]);
-    $input->setInteractive(false);
-    $output = new BufferedOutput;
-
-    expect($command->run($input, $output))->toBe(0);
-
-    return $output->fetch();
 }
 
 function themeActivationSnapshot(string $html, string $component): string
@@ -379,3 +358,22 @@ test('public Livewire checks only its own view before a mutation', function (str
     'missing unrelated view permits comments' => ['banned', 'article-comments', ['comment' => 'Posted on an incomplete theme'], [['method' => 'postComment', 'params' => []]], true, 1, 0],
     'missing unrelated view permits reactions' => ['banned', 'article-reactions', [], [['method' => 'toggleReaction', 'params' => ['like']]], true, 0, 1],
 ]);
+
+test('a missing page template leaves unrelated pages and writes available', function (): void {
+    $root = $this->activationTemporaryPath . '/themes';
+    $theme = themeActivationWriteAurora($root);
+    File::delete($theme . '/views/auth/passwords/forget.blade.php');
+    themeActivationUseBasePath($root);
+    setSetting('theme', 'aurora');
+
+    $this->get(route('welcome'))->assertOk()->assertViewIs('theme-aurora::index');
+    $this->get(route('forgot.password.get'))->assertNotFound();
+
+    $user = User::factory()->create();
+    $category = WebsiteHelpCenterCategory::create(['name' => 'Support', 'content' => 'Support', 'position' => 1]);
+    $this->actingAs($user)->post(route('help-center.ticket.store'), [
+        'category_id' => $category->id, 'title' => 'A valid ticket title', 'content' => 'A valid ticket body',
+    ])->assertRedirect();
+
+    expect($user->tickets()->count())->toBe(1);
+});

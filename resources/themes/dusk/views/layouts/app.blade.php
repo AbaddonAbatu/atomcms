@@ -44,7 +44,7 @@
                    <div class="flex gap-4 items-center">
 
                        <a href="{{ route('help-center.rules.index') }}" class="transition duration-300 ease-in-out hover:scale-110">
-                           <img src="{{ asset('/assets/images/rules.png') }}" alt="">
+                           <img src="{{ asset('/assets/images/dusk/rules_icon.png') }}" alt="">
                        </a>
 
                        @if(hasPermission('generate_logo'))

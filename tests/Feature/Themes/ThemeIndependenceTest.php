@@ -1,7 +1,6 @@
 <?php
 
 use App\Exceptions\ThemePresentationException;
-use App\Filament\Resources\Atom\CmsSettings\Pages\ManageCmsSettings;
 use App\Mail\ResetPasswordMail;
 use App\Models\Articles\WebsiteArticle;
 use App\Models\Community\RareValue\WebsiteRareValue;
@@ -23,16 +22,12 @@ use App\Services\Auth\AuthPageService;
 use App\Services\SettingsService;
 use App\Services\ThemeService;
 use App\Services\ThemeValidator;
-use Filament\Actions\EditAction;
-use Filament\Actions\Testing\TestAction;
-use Filament\Facades\Filament;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Testing\TestResponse;
-use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -544,16 +539,6 @@ function auroraLivewireSnapshot(string $html, string $component): array
     }
 
     throw new RuntimeException("The Aurora page did not render the {$component} component.");
-}
-
-function auroraEditThemeSetting(string $value): Testable
-{
-    $record = WebsiteSetting::query()->where('key', 'theme')->firstOrFail();
-
-    Filament::setCurrentPanel(Filament::getPanel('housekeeping'));
-
-    return Livewire::test(ManageCmsSettings::class)
-        ->callAction(TestAction::make(EditAction::class)->table($record), data: ['value' => $value]);
 }
 
 test('Aurora is the only discovered fixture and root public views are absent', function (): void {
