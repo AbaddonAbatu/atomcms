@@ -3,25 +3,26 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Default Active Theme
+    | Administrative Default Theme
     |--------------------------------------------------------------------------
     |
-    | It will assign the default active theme to be used if one is not set during
-    | runtime.
+    | Used when the theme website setting is empty or holds the legacy value 1.
+    | This administrative default is never a fallback for missing views.
     */
-    'active' => 'atom',
+    'default' => 'atom',
 
     /*
     |--------------------------------------------------------------------------
-    | Parent Theme
+    | Qirolab Themer Activation
     |--------------------------------------------------------------------------
     |
-    | This is a parent theme for the theme specified in the active config
-    | option. It works like the WordPress style theme hierarchy, if the blade
-    | file is not found in the currently active theme, then it will look for it
-    | in the parent theme.
+    | Must stay null. Themes render only through their own theme-<id>::
+    | namespaces; an active or parent theme here would add the legacy search
+    | paths that let views fall back to another theme or the root view tree.
     */
-    'parent' => 'atom',
+    'active' => null,
+
+    'parent' => null,
 
     /*
     |--------------------------------------------------------------------------

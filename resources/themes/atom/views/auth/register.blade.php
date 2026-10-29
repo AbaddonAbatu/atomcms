@@ -2,7 +2,7 @@
     @push('title', __('Create account'))
 
     <div class="col-span-12">
-        <x-content.content-card icon="hotel-icon" classes="flex flex-col gap-y-8">
+        <x-theme-atom::content.content-card icon="hotel-icon" classes="flex flex-col gap-y-8">
             <x-slot:title>
                 {{ __('Create your account!') }}
             </x-slot:title>
@@ -18,16 +18,16 @@
 
                         <div>
                             <div class="flex flex-col gap-y-2">
-                                <x-form.label for="username">
+                                <x-theme-atom::form.label for="username">
                                     {{ __('Username') }}
 
                                     <x-slot:info>
                                         {{ __('Your username is what you will have to use, when logging into :hotel. It is also what other users will know you as, so make sure you select a username that you like!', ['hotel' => setting('hotel_name')]) }}
                                     </x-slot:info>
-                                </x-form.label>
+                                </x-theme-atom::form.label>
                             </div>
 
-                            <x-form.input error-bag="register" name="username" type="text"
+                            <x-theme-atom::form.input error-bag="register" name="username" type="text"
                                           value="{{ old('username') }}" placeholder="{{ __('Username') }}"
                                           :autofocus="true"/>
                         </div>
@@ -35,42 +35,42 @@
                         <!-- Email Address -->
                         <div class="mt-4">
                             <div class="flex flex-col gap-y-2">
-                                <x-form.label for="mail">
+                                <x-theme-atom::form.label for="mail">
                                     {{ __('Email') }}
 
                                     <x-slot:info>
                                         {{ __('You will need your email if you were to ever forget your password, so make sure it is something that you remember.') }}
                                     </x-slot:info>
-                                </x-form.label>
+                                </x-theme-atom::form.label>
                             </div>
 
-                            <x-form.input error-bag="register" name="mail" type="email"
+                            <x-theme-atom::form.input error-bag="register" name="mail" type="email"
                                           value="{{ old('mail') }}" placeholder="{{ __('Enter your email') }}"/>
                         </div>
 
                         <!-- Password -->
                         <div class="mt-4 bg-[#efefef] rounded-md p-3 flex flex-col gap-y-6 dark:bg-gray-900">
                             <div>
-                                <x-form.label for="password">
+                                <x-theme-atom::form.label for="password">
                                     {{ __('Password') }}
 
                                     <x-slot:info>
                                         {{ __('Your password must contain atleast 8 characters. Make sure to use a unique & secure password.') }}
                                     </x-slot:info>
-                                </x-form.label>
+                                </x-theme-atom::form.label>
 
-                                <x-form.input error-bag="register" name="password" type="password"
+                                <x-theme-atom::form.input error-bag="register" name="password" type="password"
                                               placeholder="{{ __('Choose a secure password') }}"/>
                             </div>
                             <hr class="dark:border-gray-700">
 
                             <!-- Confirm Password -->
                             <div>
-                                <x-form.label for="password_confirmation">
+                                <x-theme-atom::form.label for="password_confirmation">
                                     {{ __('Repeat Password') }}
-                                </x-form.label>
+                                </x-theme-atom::form.label>
 
-                                <x-form.input error-bag="register" name="password_confirmation" type="password"
+                                <x-theme-atom::form.input error-bag="register" name="password_confirmation" type="password"
                                               placeholder="{{ __('Repeat your chosen password') }}"/>
                             </div>
                         </div>
@@ -78,16 +78,16 @@
                         @if (setting('requires_beta_code'))
                             <div class="mt-4">
                                 <div class="flex flex-col gap-y-2">
-                                    <x-form.label for="mail">
+                                    <x-theme-atom::form.label for="mail">
                                         {{ __('Beta code') }}
 
                                         <x-slot:info>
                                             {{ __('Enter the beta code you have been provided with') }}
                                         </x-slot:info>
-                                    </x-form.label>
+                                    </x-theme-atom::form.label>
                                 </div>
 
-                                <x-form.input error-bag="register" name="beta_code" type="text"
+                                <x-theme-atom::form.input error-bag="register" name="beta_code" type="text"
                                               value="{{ old('beta_code') }}"
                                               placeholder="{{ __('Enter your beta code') }}"/>
                             </div>
@@ -124,9 +124,9 @@
                         @endif
 
                         <div class="mt-4">
-                            <x-form.primary-button>
+                            <x-theme-atom::form.primary-button>
                                 {{ __('Create account') }}
-                            </x-form.primary-button>
+                            </x-theme-atom::form.primary-button>
                         </div>
                     </form>
                 </div>
@@ -136,6 +136,6 @@
                          alt="">
                 </div>
             </div>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 </x-app-layout>

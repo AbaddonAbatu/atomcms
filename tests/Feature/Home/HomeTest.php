@@ -15,7 +15,7 @@ test('guests can view a user home', function () {
 
     $this->get(route('home.show', $user->username))
         ->assertOk()
-        ->assertViewIs('home.show')
+        ->assertViewIs('theme-' . setting('theme') . '::home.show')
         ->assertViewHas('user', fn (User $viewUser): bool => $viewUser->is($user));
 });
 

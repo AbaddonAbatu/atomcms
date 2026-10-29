@@ -7,7 +7,7 @@
     <meta name="turbolinks-cache-control" content="no-cache">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <x-seo-meta />
+    <x-core::seo-meta />
 
     <link rel="icon" type="image/gif" sizes="18x17" href="{{ asset('assets/images/home_icon.gif') }}">
 
@@ -20,7 +20,7 @@
 
     @livewireStyles
     @livewireScriptConfig
-    @vite(['resources/themes/' .  setting('theme', 'atom') . '/css/app.css', 'resources/themes/' .  setting('theme') . '/js/app.js'], 'build')
+    @vite(['resources/themes/atom/css/app.css', 'resources/themes/atom/js/app.js'], 'build')
     @stack('scripts')
     <x-turnstile.scripts />
 </head>
@@ -33,34 +33,34 @@
     @endif
 
     <!-- Validation Errors -->
-    <x-messages.flash-messages />
+    <x-theme-atom::messages.flash-messages />
 
     <div id="app" class="bg-gray-100 dark:bg-gray-900">
         {{-- Top header --}}
         @auth
-            <x-top-header />
+            <x-theme-atom::top-header />
         @endauth
 
         {{-- Site Header --}}
-        <x-site-header />
+        <x-theme-atom::site-header />
 
         {{-- Navigation --}}
         <nav class="relative bg-white shadow-sm dark:bg-gray-900">
             <div class="max-w-7xl min-h-[60px] px-4 md:flex md:items-center md:justify-between md:mx-auto">
 
 
-                <x-navigation.navigation-menu />
+                <x-theme-atom::navigation.navigation-menu :languages="$languages" />
 
                 <div class="hidden lg:flex items-center">
-                    <x-navigation.theme-mode-switcher />
+                    <x-theme-atom::navigation.theme-mode-switcher />
 
-                    <x-navigation.language-selector>
+                    <x-theme-atom::navigation.language-selector :languages="$languages">
                         <img src="/assets/images/icons/flags/{{ session()->has('locale') ? session()->get('locale') : config('habbo.site.default_language') }}.png"
                              alt="">
-                    </x-navigation.language-selector>
+                    </x-theme-atom::navigation.language-selector>
                 </div>
 
-                <x-navigation.mobile-menu />
+                <x-theme-atom::navigation.mobile-menu />
             </div>
         </nav>
 
@@ -72,7 +72,7 @@
         </main>
     </div>
 
-    <x-footer />
+    <x-theme-atom::footer />
 
     @if (setting('cloudflare_turnstile_enabled'))
         <script>

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Miscellaneous;
 use App\Actions\ReplaceGeneratedLogo;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LogoGeneratorRequest;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class LogoGeneratorController extends Controller
 {
@@ -19,7 +19,7 @@ class LogoGeneratorController extends Controller
             ]);
         }
 
-        return view('logo-generator');
+        return theme_view('logo-generator');
     }
 
     public function store(LogoGeneratorRequest $request, ReplaceGeneratedLogo $replaceLogo): JsonResponse

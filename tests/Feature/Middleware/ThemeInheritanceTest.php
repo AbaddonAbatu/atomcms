@@ -4,10 +4,11 @@ use App\Mail\ResetPasswordMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
-test('Dusk renders password reset mail through the configured parent theme', function () {
+test('password reset mail renders Core\'s body with Dusk selected and no parent theme', function () {
     installHotel();
     setSetting('theme', 'dusk');
-    config(['theme.parent' => 'atom']);
+    expect(config('theme.active'))->toBeNull()
+        ->and(config('theme.parent'))->toBeNull();
     Mail::fake();
 
     $user = User::factory()->create();
@@ -16,7 +17,8 @@ test('Dusk renders password reset mail through the configured parent theme', fun
         ->assertSessionHas('success');
 
     Mail::assertQueued(ResetPasswordMail::class, function (ResetPasswordMail $mail): bool {
-        expect($mail->render())->toContain('/reset-password/' . $mail->token);
+        expect($mail->render())
+            ->toContain('Reset your password', 'Click the link to reset your password:', '/reset-password/' . $mail->token);
 
         return true;
     });

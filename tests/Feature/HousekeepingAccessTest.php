@@ -57,6 +57,19 @@ test('staff with housekeeping access can view the dashboard', function () {
         ->assertOk();
 });
 
+test('housekeeping stays reachable when the theme setting names a theme that is not installed', function () {
+    installHotel();
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    setSetting('force_staff_2fa', '0');
+    setSetting('theme', 'missing');
+
+    $staff = User::factory()->create(['rank' => 6]);
+
+    $this->actingAs($staff)
+        ->get('/housekeeping')
+        ->assertOk();
+});
+
 test('users without the housekeeping permission are forbidden', function () {
     installHotel();
 

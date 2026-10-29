@@ -4,6 +4,8 @@ use App\Models\User;
 use App\Services\HousekeepingPermissionsService;
 use App\Services\PermissionsService;
 use App\Services\SettingsService;
+use App\Services\ThemeService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Schema;
 
 if (! function_exists('setting')) {
@@ -91,5 +93,13 @@ if (! function_exists('cmsUserTable')) {
     function cmsUserTable(): string
     {
         return Schema::hasTable('website_users') ? 'website_users' : (new User)->getTable();
+    }
+}
+
+if (! function_exists('theme_view')) {
+    /** @param array<string, mixed> $data */
+    function theme_view(string $key, array $data = []): View
+    {
+        return app(ThemeService::class)->view($key, $data);
     }
 }

@@ -2,11 +2,11 @@
     @push('title', __('Account settings'))
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-3">
-        <x-user.settings.settings-navigation />
+        <x-theme-atom::user.settings.settings-navigation />
     </div>
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-9">
-        <x-content.content-card icon="hotel-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="hotel-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ __('Account settings') }}
             </x-slot:title>
@@ -20,53 +20,53 @@
                 @csrf
 
                 <div class="flex flex-col gap-y-1">
-                    <x-form.label for="mail">
+                    <x-theme-atom::form.label for="mail">
                         {{ __('E-mail') }}
 
                         <x-slot:info>
                             {{ __('Make sure to use an email that you remember, if you ever lose your password, your email will be required.') }}
                         </x-slot:info>
-                    </x-form.label>
+                    </x-theme-atom::form.label>
 
-                    <x-form.input name="mail" type="email" value="{{ $user->mail }}" :autofocus="true" />
+                    <x-theme-atom::form.input name="mail" type="email" value="{{ $user->mail }}" :autofocus="true" />
                 </div>
 
                 @if ($canChangeName)
                     <div class="flex flex-col gap-y-1">
-                        <x-form.label for="username">
+                        <x-theme-atom::form.label for="username">
                             {{ __('Username') }}
 
                             <x-slot:info>
                                 {{ __('Your username is what you and others will see in-game') }}
                             </x-slot:info>
-                        </x-form.label>
+                        </x-theme-atom::form.label>
 
-                        <x-form.input name="username" value="{{ $user->username }}" />
+                        <x-theme-atom::form.input name="username" value="{{ $user->username }}" />
                     </div>
                 @endif
 
                 <div class="flex flex-col gap-y-1">
-                    <x-form.label for="motto">
+                    <x-theme-atom::form.label for="motto">
                         {{ __('Motto') }}
 
                         <x-slot:info>
                             {{ __('Spice up your profile with a nice motto') }}
                         </x-slot:info>
-                    </x-form.label>
+                    </x-theme-atom::form.label>
 
-                    <x-form.input name="motto" value="{{ $user->motto }}" />
+                    <x-theme-atom::form.input name="motto" value="{{ $user->motto }}" />
                 </div>
 
                 <div class="flex flex-col gap-y-1">
-                    <x-form.label for="current_password">
+                    <x-theme-atom::form.label for="current_password">
                         {{ __('Current password') }}
 
                         <x-slot:info>
                             {{ __('Required to change your e-mail address.') }}
                         </x-slot:info>
-                    </x-form.label>
+                    </x-theme-atom::form.label>
 
-                    <x-form.input name="current_password" type="password" autocomplete="current-password" />
+                    <x-theme-atom::form.input name="current_password" type="password" autocomplete="current-password" />
                 </div>
 
                 @if (setting('google_recaptcha_enabled'))
@@ -78,11 +78,11 @@
                 @endif
 
                 <div class="flex w-full justify-start md:justify-end">
-                    <x-form.secondary-button classes="lg:w-1/4">
+                    <x-theme-atom::form.secondary-button classes="lg:w-1/4">
                         {{ __('Update settings') }}
-                    </x-form.secondary-button>
+                    </x-theme-atom::form.secondary-button>
                 </div>
             </form>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 </x-app-layout>

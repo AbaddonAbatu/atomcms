@@ -11,12 +11,12 @@
             <div class="relative w-full overflow-hidden text-black">
                 <input id="username-input" type="text" placeholder="{{ __('Enter your username') }}" name="username" class="relative py-2 rounded-md mt-3 w-full">
 
-                <img id="user-avatar" class="absolute right-0 -top-4" src="{{ asset('/assets/images/dusk/ghost.png') }}" alt="">
+                <img id="user-avatar" class="absolute right-0 -top-4" src="{{ asset('/assets/images/ghost.png') }}" alt="">
             </div>
 
             <input type="password" placeholder="{{ __('Enter your password') }}" name="password" class="relative py-2 rounded-md mt-3 text-black w-full">
 
-            <x-site-captchas />
+            <x-theme-dusk::site-captchas />
 
             <div class="mt-4 flex gap-4">
                 <button type="submit" class="py-2 px-4 text-white bg-yellow-500 border-2 border-yellow-300 w-full rounded-md transition duration-300 ease-in-out hover:scale-[102%]">{{ __('Login') }}</button>
@@ -43,7 +43,7 @@
             <!-- Additional required wrapper -->
             <div class="swiper-wrapper" style="z-index: 14;">
                 @foreach($articles as $article)
-                    <x-article-card :article="$article" />
+                    <x-theme-dusk::article-card :article="$article" />
                 @endforeach
             </div>
         </div>
@@ -57,7 +57,7 @@
                 <img class="h-[250px] w-full object-cover object-center rounded-md custom-shadow" src="{{ $photo->url }}" alt="">
 
                 <div class="absolute right-2 bottom-2 bg-black/70 p-2 rounded-md text-white flex gap-x-2 z-[5]">
-                    <img class="self-center" src="{{ asset('/assets/images/dusk/author_camera_icon.png') }}" alt="">
+                    <img class="self-center" src="{{ asset('/assets/images/icons/author_camera_icon.png') }}" alt="">
                     <small>
                         {{ $photo->user->username }}
                     </small>
@@ -94,7 +94,7 @@
 
 
                 if (!data.data.look) {
-                    avatar.src = "/assets/images/dusk/ghost.png";
+                    avatar.src = @js(asset('/assets/images/ghost.png'));
 
                     return;
                 }

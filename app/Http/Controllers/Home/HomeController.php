@@ -22,7 +22,7 @@ class HomeController extends Controller
 
     public function show(User $user): View
     {
-        return view('home.show', [
+        return theme_view('home.show', [
             'user' => $user,
             'isMe' => Auth::id() === $user->id,
         ]);

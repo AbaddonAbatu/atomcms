@@ -9,4 +9,4 @@
     </div>
 </footer>
 
-<x-footer-credits />
+<x-theme-atom::footer-credits />

@@ -2,11 +2,11 @@
     @push('title', __('Session logs'))
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-3">
-        <x-user.settings.settings-navigation />
+        <x-theme-atom::user.settings.settings-navigation />
     </div>
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-9">
-        <x-content.content-card icon="hotel-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="hotel-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ __('Session logs') }}
             </x-slot:title>
@@ -67,6 +67,6 @@
                     </tbody>
                 </table>
             </div>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 </x-app-layout>

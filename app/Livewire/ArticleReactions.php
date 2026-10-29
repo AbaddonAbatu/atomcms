@@ -2,18 +2,21 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\UsesPublicTheme;
 use App\Models\Articles\WebsiteArticle;
 use App\Models\Articles\WebsiteArticleReaction;
 use App\Models\User;
 use App\Services\Articles\ReactionService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class ArticleReactions extends Component
 {
+    use UsesPublicTheme;
+
     #[Locked]
     public WebsiteArticle $article;
 
@@ -87,7 +90,7 @@ class ArticleReactions extends Component
             ->reject(fn ($reaction) => $usedReactionNames->contains($reaction) || $myReactions->contains($reaction))
             ->values();
 
-        return view('livewire.article-reactions', [
+        return theme_view($this->themeView(), [
             'article' => $this->article,
             'articleReactions' => $articleReactions,
             'myReactions' => $myReactions,

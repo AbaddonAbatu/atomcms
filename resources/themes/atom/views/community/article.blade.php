@@ -15,7 +15,7 @@
                 style="background: rgba(0, 0, 0, 0.5) url({{ asset(sprintf('assets/images/%s', $article->user ? $article->user->permission->staff_background ?? 'staff-bg.png'  : 'staff-bg.png')) }});">
             </div>
 
-            <a href="{{ route('home.show', $article->user ?? \App\Models\User::first()) }}" class="absolute top-4 left-1 drop-shadow">
+            <a href="{{ route('home.show', $authorHome) }}" class="absolute top-4 left-1 drop-shadow">
                 <img style="image-rendering: pixelated;" class="transition duration-300 ease-in-out hover:scale-105"
                     src="{{ setting('avatar_imager') }}{{ $article->user?->look }}&direction=2&head_direction=3&gesture=sml&action=wav"
                     alt="">
@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        <x-content.content-card icon="article-icon" classes="border dark:bg-gray-800 dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="article-icon" classes="border dark:bg-gray-800 dark:border-gray-900">
             <x-slot:title>
                 {{ __('Other articles') }}
             </x-slot:title>
@@ -59,7 +59,7 @@
                     </p>
                 @endforelse
             </div>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 
     <div class="col-span-12 space-y-4 md:col-span-9">

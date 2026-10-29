@@ -58,7 +58,6 @@ class Kernel extends HttpKernel
         TrimStrings::class,
         ConvertEmptyStringsToNull::class,
         ConfigureRuntimeFilesystems::class,
-        SetThemeMiddleware::class,
         InstallationMiddleware::class,
     ];
 
@@ -77,6 +76,7 @@ class Kernel extends HttpKernel
             VerifyCsrfToken::class,
             SubstituteBindings::class,
             LocalizationMiddleware::class,
+            SetThemeMiddleware::class,
         ],
 
         'api' => [

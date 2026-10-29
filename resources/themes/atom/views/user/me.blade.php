@@ -2,7 +2,7 @@
     @push('title', auth()->user()->username)
 
     <div class="col-span-12 space-y-3 md:col-span-9">
-        <x-user.me-backdrop :user="$user" />
+        <x-theme-atom::user.me-backdrop :user="$user" />
 
         <div
             class="flex flex-col gap-3 rounded border bg-white p-1 shadow-sm dark:border-gray-900 dark:bg-gray-800 lg:flex-row lg:items-center lg:justify-between">
@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        <x-content.content-card icon="friends-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="friends-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ sprintf(__('User Referrals (%s/%s)'), auth()->user()->referrals->referrals_total ?? 0, setting('referrals_needed')) }}
             </x-slot:title>
@@ -60,14 +60,14 @@
                 </small>
 
                 <div class="grid grid-cols-12 gap-2">
-                    <x-form.input classes="col-span-12 md:col-span-10 text-sm" name="referral"
+                    <x-theme-atom::form.input classes="col-span-12 md:col-span-10 text-sm" name="referral"
                                   value="{{ sprintf('%s/register/%s', config('habbo.site.site_url'), auth()->user()->referral_code) }}"
                                   :autofocus="false" :readonly="true" />
 
                     <div class="col-span-12 flex md:col-span-2" onclick="copyCode()">
-                        <x-form.secondary-button>
+                        <x-theme-atom::form.secondary-button>
                             {{ __('Copy code') }}
-                        </x-form.secondary-button>
+                        </x-theme-atom::form.secondary-button>
                     </div>
 
                 </div>
@@ -75,9 +75,9 @@
                 @if (auth()->user()->referrals?->referrals_total >= (int) setting('referrals_needed'))
                     <form method="POST" action="{{ route('claim.referral-reward') }}">
                         @csrf
-                        <x-form.secondary-button classes="mt-2">
+                        <x-theme-atom::form.secondary-button classes="mt-2">
                             {{ __('Claim your referrals reward!') }}
-                        </x-form.secondary-button>
+                        </x-theme-atom::form.secondary-button>
                     </form>
                 @else
                     <button disabled class="mt-2 w-full rounded bg-gray-400 p-2 text-white dark:bg-gray-900">
@@ -85,7 +85,7 @@
                     </button>
                 @endif
             </div>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 
     <div class="col-span-12 space-y-4 md:col-span-3">
@@ -93,9 +93,9 @@
             <div class="relative swiper articles-slider">
                 <div class="swiper-wrapper">
                     @forelse ($articles as $article)
-                        <x-article-card :for-slider="true" :article="$article" />
+                        <x-theme-atom::article-card :for-slider="true" :article="$article" />
                     @empty
-                        <x-filler-article-card />
+                        <x-theme-atom::filler-article-card />
                     @endforelse
                 </div>
             </div>
@@ -103,7 +103,7 @@
         </div>
 
         <div class="!mt-3">
-            <x-user.discord-widget />
+            <x-theme-atom::user.discord-widget />
         </div>
     </div>
 

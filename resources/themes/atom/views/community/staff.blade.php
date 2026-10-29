@@ -4,7 +4,7 @@
     <div class="col-span-12 lg:col-span-9 lg:w-[96%]">
         <div class="flex flex-col gap-y-4">
             @foreach ($employees as $employee)
-                <x-content.staff-content-section :badge="$employee->badge" :color="$employee->staff_color">
+                <x-theme-atom::content.staff-content-section :badge="$employee->badge" :color="$employee->staff_color">
                     <x-slot:title>
                         {{ $employee->rank_name }}
                     </x-slot:title>
@@ -15,7 +15,7 @@
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($employee->users as $staff)
-                            <x-community.staff-card :user="$staff" />
+                            <x-theme-atom::community.staff-card :user="$staff" />
                         @endforeach
                     </div>
 
@@ -24,13 +24,13 @@
                             {{ __('We currently have no staff in this position') }}
                         </div>
                     @endif
-                </x-content.staff-content-section>
+                </x-theme-atom::content.staff-content-section>
             @endforeach
         </div>
     </div>
 
     <div class="col-span-12 lg:col-span-3 lg:w-[110%] space-y-4 lg:-ml-[32px]">
-        <x-content.content-card icon="chat-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="chat-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ __(':hotel staff', ['hotel' => setting('hotel_name')]) }}
             </x-slot:title>
@@ -48,9 +48,9 @@
                     {{ __('Most of our team usually consists of players that have been around :hotel for quite a while, but this does not mean we only recruit old & known players, we recruit those who shine out to us!', ['hotel' => setting('hotel_name')]) }}
                 </p>
             </div>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
 
-        <x-content.content-card icon="chat-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="chat-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ __('Apply for staff') }}
             </x-slot:title>
@@ -71,6 +71,6 @@
                     ) !!}
                 </p>
             </div>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 </x-app-layout>

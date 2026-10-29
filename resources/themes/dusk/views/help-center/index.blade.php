@@ -4,7 +4,7 @@
     <div class="col-span-12 flex flex-col lg:flex-row gap-4">
         <div class="flex flex-col gap-4 w-full lg:w-3/5">
             @foreach($categories->where('small_box', false) as $category)
-                <x-content.content-card icon="duo-chat-icon" classes="border border-gray-900">
+                <x-theme-dusk::content.content-card icon="duo-chat-icon" classes="border border-gray-900">
                     <x-slot:title>
                         {{ $category->name }}
                     </x-slot:title>
@@ -22,13 +22,13 @@
                             {{ $category->button_text }}
                         </button>
                     </a>
-                </x-content.content-card>
+                </x-theme-dusk::content.content-card>
             @endforeach
         </div>
 
         <div class="flex flex-col gap-4 w-full lg:w-2/5">
             @foreach($categories->where('small_box', true) as $category)
-                <x-content.content-card icon="duo-chat-icon" classes="border border-gray-900">
+                <x-theme-dusk::content.content-card icon="duo-chat-icon" classes="border border-gray-900">
                     <x-slot:title>
                         {{ $category->name }}
                     </x-slot:title>
@@ -44,7 +44,7 @@
                             {{ $category->button_text }}
                         </button>
                     </a>
-                </x-content.content-card>
+                </x-theme-dusk::content.content-card>
             @endforeach
         </div>
     </div>

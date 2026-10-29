@@ -48,8 +48,9 @@ class SettingsService
 
     /**
      * Drop the persisted and memoized settings so the next read refetches.
-     * Instance-level, so objects already holding the singleton see fresh
-     * values instead of a stale forgotten instance.
+     * Instance-level, so objects already holding this scoped instance see
+     * fresh values instead of a stale forgotten instance. Other application
+     * instances re-read the persistent cache when their own scope resets.
      */
     public function refresh(): void
     {

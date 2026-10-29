@@ -10,14 +10,14 @@ use App\Models\Shop\WebsiteShopCategory;
 use App\Models\Shop\WebsiteShopPackage;
 use App\Services\Shop\ShopReadService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class ShopController extends Controller
 {
     public function __invoke(?WebsiteShopCategory $category): View
     {
-        return view('shop.shop', app(ShopReadService::class)->catalog($category));
+        return theme_view('shop.shop', app(ShopReadService::class)->catalog($category));
     }
 
     public function purchasePackage(WebsiteShopPackage $package, PurchasePackageRequest $request, PurchaseShopPackage $purchaseShopPackage): RedirectResponse

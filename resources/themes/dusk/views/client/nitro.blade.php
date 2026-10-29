@@ -12,34 +12,34 @@
 
     @livewireStyles
     @livewireScriptConfig
-    @vite(['resources/themes/' .  setting('theme') . '/css/app.css', 'resources/themes/' .  setting('theme') . '/js/app.js'], 'build')
+    @vite(['resources/themes/dusk/css/app.css', 'resources/themes/dusk/js/app.js'], 'build')
 </head>
 
 <body class="overflow-hidden" id="nitro-client">
 <div class="absolute top-4 left-4 z-10 flex gap-x-2">
     <a data-turbolinks="false" href="{{ route('me.show') }}">
-        <x-client.client-button>
-            <x-icons.home />
-        </x-client.client-button>
+        <x-theme-dusk::client.client-button>
+            <x-theme-dusk::icons.home />
+        </x-theme-dusk::client.client-button>
     </a>
 
     <div onclick="reloadClient()">
-        <x-client.client-button>
-            <x-icons.reload />
-        </x-client.client-button>
+        <x-theme-dusk::client.client-button>
+            <x-theme-dusk::icons.reload />
+        </x-theme-dusk::client.client-button>
     </div>
 
     <div onclick="toggleFullscreen()">
-        <x-client.client-button>
-            <x-icons.fullscreen />
-        </x-client.client-button>
+        <x-theme-dusk::client.client-button>
+            <x-theme-dusk::icons.fullscreen />
+        </x-theme-dusk::client.client-button>
     </div>
 
-    <x-client.client-button classes="flex items-center justify-center gap-x-1">
-        <x-icons.user />
+    <x-theme-dusk::client.client-button classes="flex items-center justify-center gap-x-1">
+        <x-theme-dusk::icons.user />
 
         <span id="online-count"></span>
-    </x-client.client-button>
+    </x-theme-dusk::client.client-button>
 </div>
 <iframe id="nitro" src="{{ sprintf('%s/index.html?sso=%s', setting('nitro_path'), $sso) }}"
         class="absolute top-0 left-0 m-0 h-full w-full overflow-hidden border-none p-0"></iframe>
@@ -61,9 +61,9 @@
             </button>
 
             <a data-turbolinks="false" href="{{ route('me.show') }}">
-                <x-form.secondary-button>
+                <x-theme-dusk::form.secondary-button>
                     {{ __('Back to website') }}
-                </x-form.secondary-button>
+                </x-theme-dusk::form.secondary-button>
             </a>
         </div>
     </div>

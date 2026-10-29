@@ -38,6 +38,42 @@ function resetInstallationCaches(): void
     app()->forgetInstance(SettingsService::class);
 }
 
+/**
+ * The wizard splits every setting, in id order, into SETTING_STEPS chunks; this
+ * returns the keys of the chunk shown on the given step.
+ *
+ * @return list<string>
+ */
+function installationStepKeys(int $step): array
+{
+    $keys = WebsiteSetting::query()->orderBy('id')->pluck('key');
+    $chunkSize = max(1, (int) ceil($keys->count() / WebsiteInstallation::SETTING_STEPS));
+
+    return $keys->chunk($chunkSize)->values()->get($step - 1)?->values()->all() ?? [];
+}
+
+function installationStepFor(string $key): int
+{
+    foreach (range(WebsiteInstallation::FIRST_STEP, WebsiteInstallation::SETTING_STEPS) as $step) {
+        if (in_array($key, installationStepKeys($step), true)) {
+            return $step;
+        }
+    }
+
+    throw new RuntimeException("No installation step shows the [{$key}] setting.");
+}
+
+/** Puts the wizard on the step that shows the given setting, as the installing visitor. */
+function openInstallationStepFor(string $key): int
+{
+    $step = installationStepFor($key);
+
+    startFreshInstallation()->update(['step' => $step, 'user_ip' => '127.0.0.1']);
+    resetInstallationCaches();
+
+    return $step;
+}
+
 test('the wizard walks from key entry to the hotel without falling back', function () {
     installHotel();
     startFreshInstallation();
@@ -120,7 +156,7 @@ test('optional settings are not blocked by browser required validation', functio
 
     foreach (WebsiteSetting::OPTIONAL_INSTALLATION_KEYS as $key) {
         $setting = WebsiteSetting::query()->where('key', $key)->firstOrFail();
-        $content = view('installation.partials.setting-input', [
+        $content = view('core::installation.partials.setting-input', [
             'setting' => $setting,
             'errors' => new ViewErrorBag,
         ])->render();
@@ -131,7 +167,7 @@ test('optional settings are not blocked by browser required validation', functio
     }
 
     $setting = WebsiteSetting::query()->where('key', 'hotel_name')->firstOrFail();
-    $content = view('installation.partials.setting-input', [
+    $content = view('core::installation.partials.setting-input', [
         'setting' => $setting,
         'errors' => new ViewErrorBag,
     ])->render();
@@ -251,4 +287,18 @@ test('saving a step only writes the settings that belong to it', function () {
 
     expect(WebsiteSetting::where('key', $stepOneKey)->value('value'))->toBe('legit step one value')
         ->and(WebsiteSetting::where('key', $laterStepKey)->value('value'))->toBe($laterStepValue);
+});
+
+test('restarting the installation resets the theme to the configured default', function () {
+    installHotel();
+    config(['theme.default' => 'dusk']);
+    setSetting('theme', 'atom');
+    openInstallationStepFor('theme');
+
+    expect(setting('theme'))->toBe('atom');
+
+    $this->post(route('installation.restart'))->assertRedirect(route('installation.index'));
+
+    expect(WebsiteSetting::where('key', 'theme')->value('value'))->toBe('dusk')
+        ->and(setting('theme'))->toBe('dusk');
 });

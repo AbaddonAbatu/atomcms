@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Community\Staff;
 use App\Http\Controllers\Controller;
 use App\Services\Community\StaffService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class StaffController extends Controller
 {
@@ -16,7 +16,7 @@ class StaffController extends Controller
     {
         $employees = $this->staffService->fetchStaffPositions(AuthenticatedUser::from($request));
 
-        return view('community.staff', [
+        return theme_view('community.staff', [
             'employees' => $employees,
         ]);
     }

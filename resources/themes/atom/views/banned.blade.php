@@ -30,15 +30,15 @@
                             </p>
 
                             <a href="{{ setting('discord_invitation_link') }}" target="_blank">
-                                <x-form.primary-button>
+                                <x-theme-atom::form.primary-button>
                                     {{ __('Join discord') }}
-                                </x-form.primary-button>
+                                </x-theme-atom::form.primary-button>
                             </a>
                         </div>
                     </div>
 
                     <div class="mr-8 hidden items-center lg:flex">
-                        <img src="{{ asset('assets/images/angry_frank.png') }}" alt="">
+                        <img src="{{ asset('/assets/images/angry_frank.png') }}" alt="">
                     </div>
                 </div>
             </div>

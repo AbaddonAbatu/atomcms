@@ -6,6 +6,7 @@ use App\Providers\EventServiceProvider;
 use App\Providers\Filament\AdminFilamentPanelProvider;
 use App\Providers\FortifyServiceProvider;
 use App\Providers\RouteServiceProvider;
+use App\Providers\ThemeServiceProvider;
 use Illuminate\Auth\AuthServiceProvider;
 use Illuminate\Auth\Passwords\PasswordResetServiceProvider;
 use Illuminate\Broadcasting\BroadcastServiceProvider;
@@ -219,6 +220,7 @@ return [
          * Application Service Providers...
          */
         AppServiceProvider::class,
+        ThemeServiceProvider::class,
         EmulatorServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         EventServiceProvider::class,

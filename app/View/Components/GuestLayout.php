@@ -2,9 +2,13 @@
 
 namespace App\View\Components;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
-use Illuminate\View\View;
 
+/**
+ * Unused by the bundled pages and not part of the presentation contract: a
+ * theme without layouts.guest fails clearly instead of borrowing another's.
+ */
 class GuestLayout extends Component
 {
     /**
@@ -12,6 +16,6 @@ class GuestLayout extends Component
      */
     public function render(): View
     {
-        return view('layouts.guest');
+        return theme_view('layouts.guest');
     }
 }

@@ -3,14 +3,11 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
-use App\Models\Articles\WebsiteArticle;
-use App\Models\Miscellaneous\CameraWeb;
 use App\Models\User;
+use App\Services\Auth\AuthPageService;
 use App\Services\Auth\PasswordVerifier;
-use App\Services\Community\CameraService;
 use App\Support\FrontendUrls;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -54,34 +51,18 @@ class FortifyServiceProvider extends ServiceProvider
 
     private function configureViews(): void
     {
-        Fortify::loginView(fn () => view('auth.login', $this->authPageData(4, 4)));
+        Fortify::loginView(fn () => theme_view('auth.login', app(AuthPageService::class)->loginData()));
 
         Fortify::registerView(function (Request $request) {
             if (setting('disable_registration') === '1') {
                 return redirect(app(FrontendUrls::class)->route('welcome'))->withErrors(['register' => __('Registration is currently disabled.')]);
             }
 
-            return view('auth.register', [
-                'referral_code' => $request->route('referral_code'),
-                ...$this->authPageData(4, 2),
-            ]);
+            return theme_view('auth.register', app(AuthPageService::class)->registrationData($request->route('referral_code')));
         });
 
-        Fortify::confirmPasswordView(fn () => view('auth.passwords.confirm'));
-        Fortify::twoFactorChallengeView(fn () => view('auth.two-factor-challenge'));
-    }
-
-    /**
-     * Latest articles and camera photos shown alongside the auth forms.
-     *
-     * @return array{articles: Collection<int, WebsiteArticle>, photos: Collection<int, CameraWeb>}
-     */
-    private function authPageData(int $articles, int $photos): array
-    {
-        return [
-            'articles' => WebsiteArticle::latest('id')->take($articles)->has('user')->with('user:id,username,look')->get(),
-            'photos' => app(CameraService::class)->latestPhotos($photos),
-        ];
+        Fortify::confirmPasswordView(fn () => theme_view('auth.passwords.confirm'));
+        Fortify::twoFactorChallengeView(fn () => theme_view('auth.two-factor-challenge'));
     }
 
     private function authenticate(): void

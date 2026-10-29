@@ -1,6 +1,6 @@
 @props(['package'])
 
-<x-content.shop-card>
+<x-theme-dusk::content.shop-card>
     <x-slot:title>
         <div class="flex justify-between w-full">
             <p>
@@ -57,14 +57,14 @@
         }">
             <div class="w-full flex gap-2">
                 @if($package->is_giftable)
-                    <x-modals.modal-wrapper>
+                    <x-theme-dusk::modals.modal-wrapper>
                         <div x-on:click="open = true">
-                            <x-form.primary-button classes="!text-blue-100 px-4 w-full !bg-[#0b80b3] !border-[#1891c4] hover:!bg-[#096891] transition-all">
-                                <x-icons.gift />
-                            </x-form.primary-button>
+                            <x-theme-dusk::form.primary-button classes="!text-blue-100 px-4 w-full !bg-[#0b80b3] !border-[#1891c4] hover:!bg-[#096891] transition-all">
+                                <x-theme-dusk::icons.gift />
+                            </x-theme-dusk::form.primary-button>
                         </div>
 
-                        <x-modals.regular-modal>
+                        <x-theme-dusk::modals.regular-modal>
                             <x-slot name="title">
                                 <h2 class="text-2xl">
                                     {{ __('Gift :package', ['package' => $package->name]) }}
@@ -179,8 +179,8 @@
                                     </button>
                                 </form>
                             </div>
-                        </x-modals.regular-modal>
-                    </x-modals.modal-wrapper>
+                        </x-theme-dusk::modals.regular-modal>
+                    </x-theme-dusk::modals.modal-wrapper>
                 @endif
             </div>
 
@@ -193,9 +193,9 @@
                   ">
                 @csrf
 
-                <x-form.secondary-button type="submit" classes="text-green-100 px-4">
+                <x-theme-dusk::form.secondary-button type="submit" classes="text-green-100 px-4">
                     {{ __('Buy') }}
-                </x-form.secondary-button>
+                </x-theme-dusk::form.secondary-button>
             </form>
 
             <div x-show="confirmOpen" style="display: none" x-on:keydown.escape.prevent.stop="confirmOpen = false" role="dialog" aria-modal="true" class="fixed inset-0 z-[60] overflow-y-auto">
@@ -232,4 +232,4 @@
             </div>
         </div>
     @endauth
-</x-content.shop-card>
+</x-theme-dusk::content.shop-card>

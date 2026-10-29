@@ -14,7 +14,7 @@
     </script>
 
     <div class="col-span-12 flex flex-col lg:grid grid-cols-4 gap-4" x-data="badgeDrawer({ cost: {{ $cost }}, currencyType: '{{ $currencyType }}' })">
-        <x-content.content-card icon="hotel-icon" classes="border dark:border-gray-900 col-span-3">
+        <x-theme-dusk::content.content-card icon="hotel-icon" classes="border dark:border-gray-900 col-span-3">
             <x-slot:title>
                 {{ __('Badge Drawer') }}
             </x-slot:title>
@@ -97,8 +97,8 @@
                     </div>
                 </div>
             </div>
-        </x-content.content-card>
-        <x-content.content-card icon="hotel-icon" classes="border dark:border-gray-900 col-span-1 h-max">
+        </x-theme-dusk::content.content-card>
+        <x-theme-dusk::content.content-card icon="hotel-icon" classes="border dark:border-gray-900 col-span-1 h-max">
             <x-slot:title>
                 {{ __('Badge Drawer Details') }}
             </x-slot:title>
@@ -133,7 +133,7 @@
                     <button type="button" x-text="buttonText" @click="buyBadge" class="w-full rounded text-white p-2 border-2 border-green-500 transition ease-in-out duration-150 font-semibold bg-green-600 hover:bg-green-700" :class="isValid ? 'cursor-pointer' : 'cursor-not-allowed'" :disabled="!isValid || {{ $folderError ? 'true' : 'false' }}"></button>
                 </div>
             </div>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     

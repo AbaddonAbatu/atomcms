@@ -8,9 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AccountSettingsFormRequest;
 use App\Services\User\SessionService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class AccountSettingsController extends Controller
 {
@@ -18,7 +18,7 @@ class AccountSettingsController extends Controller
     {
         $user = AuthenticatedUser::current();
 
-        return view('user.settings.account', [
+        return theme_view('user.settings.account', [
             'user' => $user,
             'canChangeName' => $settings->canChangeName($user),
         ]);
@@ -28,7 +28,7 @@ class AccountSettingsController extends Controller
     {
         $sessions = $sessionService->fetchSessionLogs($request);
 
-        return view('user.settings.session-logs', [
+        return theme_view('user.settings.session-logs', [
             'logs' => $sessions,
         ]);
     }

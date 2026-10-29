@@ -7,10 +7,10 @@ use App\Http\Requests\WebsiteTicketFormRequest;
 use App\Models\Help\WebsiteHelpCenterTicket;
 use App\Services\Help\TicketService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class TicketController extends Controller
 {
@@ -18,14 +18,14 @@ class TicketController extends Controller
     {
         $this->authorize('viewAny', WebsiteHelpCenterTicket::class);
 
-        return view('help-center.tickets.index', [
+        return theme_view('help-center.tickets.index', [
             'tickets' => app(TicketService::class)->tickets(AuthenticatedUser::current(), true),
         ]);
     }
 
     public function create(): View
     {
-        return view('help-center.tickets.create', [
+        return theme_view('help-center.tickets.create', [
             'categories' => app(TicketService::class)->categories(),
             'openTickets' => $this->myOpenTickets(),
         ]);
@@ -44,7 +44,7 @@ class TicketController extends Controller
 
         $ticket = app(TicketService::class)->show(AuthenticatedUser::current(), $ticket);
 
-        return view('help-center.tickets.edit', [
+        return theme_view('help-center.tickets.edit', [
             'ticket' => $ticket,
             'categories' => app(TicketService::class)->categories(),
             'openTickets' => $this->myOpenTickets($ticket),
@@ -64,7 +64,7 @@ class TicketController extends Controller
 
         $ticket = app(TicketService::class)->show(AuthenticatedUser::current(), $ticket);
 
-        return view('help-center.tickets.show', [
+        return theme_view('help-center.tickets.show', [
             'ticket' => $ticket,
             'openTickets' => $this->myOpenTickets($ticket),
         ]);

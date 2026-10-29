@@ -9,6 +9,7 @@ use App\Models\Home\HomeCategory;
 use App\Models\Home\HomeItem;
 use App\Models\Home\UserHomeItem;
 use App\Models\User;
+use App\Services\ThemeService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -209,17 +210,18 @@ class HomeService
         $owner->homeRatings()->updateOrCreate(['user_id' => $actor->id], ['rating' => $rating]);
     }
 
+    /**
+     * Renders the widget from the selected theme. Widget templates are non-core
+     * views and return null when omitted, without falling back to another theme
+     * or loading the widget's data.
+     */
     public function getWidgetContent(User $user, UserHomeItem $item): ?string
     {
-        $viewName = "home.widgets.{$item->widget_type}";
+        return app(ThemeService::class)->optionalView("home.widgets.{$item->widget_type}", function () use ($user, $item): array {
+            $user = $this->loadWidgetData($user, $item);
 
-        if (! view()->exists($viewName)) {
-            return null;
-        }
-
-        $user = $this->loadWidgetData($user, $item);
-
-        return view($viewName, compact('item', 'user'))->render();
+            return compact('item', 'user');
+        })?->render();
     }
 
     public function loadWidgetData(User $user, UserHomeItem $item, string $routeName = 'home.show'): User
