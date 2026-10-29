@@ -43,6 +43,29 @@ test('Core SEO metadata and Fancybox assets render without a public theme', func
     expect(substr_count($html, 'fancybox.css'))->toBe(1);
 });
 
+test('Core tool, client, toast and editor runtimes render without a public theme', function (): void {
+    setSetting('tinymce_api_key', 'core-editor-key');
+
+    $html = Blade::render(<<<'BLADE'
+        <x-core::badge-drawer-script :cost="275" currency-type="duckets">
+            <div id="theme-badge-markup"></div>
+        </x-core::badge-drawer-script>
+        <x-core::logo-generator-script />
+        <x-core::client.flash-runtime sso="core-ticket">
+            <link rel="stylesheet" href="/theme-client.css">
+        </x-core::client.flash-runtime>
+        <x-core::toast-hub-script />
+        <x-core::client.nitro-runtime />
+        <x-core::form.wysiwyg-assets />
+        BLADE);
+
+    foreach (['function badgeDrawer(', 'function logoGenerator()', 'swfobject.embedSWF(', 'window.toastHub =', 'function getOnlineUserCount()', 'tinymce/7/tinymce.min.js'] as $script) {
+        expect(substr_count($html, $script))->toBe(1);
+    }
+    expect($html)->toContain('id="theme-badge-markup"', '#FF4500', "this.guide.style.display = value ? 'block' : 'none';", 'combinedWidth += (logoContainer.childNodes.length - 1) * 2;', '/assets/images/logo-generator/${this.fontType}/${letter}.png')
+        ->toContain('href="/theme-client.css"', '"sso.ticket": \'core-ticket\'', 'https://cdn.tiny.cloud/1/core-editor-key/tinymce/7/tinymce.min.js');
+});
+
 function rewindCoreInstallation(int $step): void
 {
     WebsiteInstallation::query()->update([
