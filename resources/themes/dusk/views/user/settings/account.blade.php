@@ -69,7 +69,13 @@
                     <x-theme-dusk::form.input name="current_password" type="password" autocomplete="current-password" />
                 </div>
 
-                <x-theme-dusk::site-captchas />
+                <div class="w-full flex mt-3 justify-start">
+                    <div class="mt-4">
+                        <x-core::captcha.widgets :turnstile="false" />
+                    </div>
+
+                    <x-core::captcha.widgets :recaptcha="false" />
+                </div>
 
                 <div class="flex w-full justify-start md:justify-end">
                     <x-theme-dusk::form.secondary-button classes="lg:w-1/4">

@@ -72,13 +72,7 @@
 
                 <x-theme-atom::form.input classes="mb-3" name="search" placeholder="{{ __('Search for a rare') }}"/>
 
-                @if (setting('google_recaptcha_enabled'))
-                    <div class="g-recaptcha" data-sitekey="{{ config('habbo.site.recaptcha_site_key') }}"></div>
-                @endif
-
-                @if (setting('cloudflare_turnstile_enabled'))
-                    <x-turnstile />
-                @endif
+                <x-core::captcha.widgets />
 
                 <x-theme-atom::form.secondary-button>
                     {{ __('Search') }}

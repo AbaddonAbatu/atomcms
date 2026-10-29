@@ -26,13 +26,7 @@
         <x-theme-dusk::form.input error-bag="login" name="password" placeholder="{{ __('Password') }}" type="password" />
     </div>
 
-    @if (setting('google_recaptcha_enabled'))
-        <div class="g-recaptcha" data-sitekey="{{ config('habbo.site.recaptcha_site_key') }}"></div>
-    @endif
-
-    @if (setting('cloudflare_turnstile_enabled'))
-        <x-turnstile />
-    @endif
+    <x-core::captcha.widgets />
 
     <x-theme-dusk::form.primary-button>
         {{ __('Login') }}

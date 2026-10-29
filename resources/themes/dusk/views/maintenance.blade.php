@@ -108,6 +108,6 @@
 @endguest
 </body>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+<x-core::captcha.assets />
 
 </html>

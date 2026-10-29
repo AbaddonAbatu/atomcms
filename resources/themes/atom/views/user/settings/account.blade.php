@@ -69,13 +69,7 @@
                     <x-theme-atom::form.input name="current_password" type="password" autocomplete="current-password" />
                 </div>
 
-                @if (setting('google_recaptcha_enabled'))
-                    <div class="g-recaptcha" data-sitekey="{{ config('habbo.site.recaptcha_site_key') }}"></div>
-                @endif
-
-                @if (setting('cloudflare_turnstile_enabled'))
-                    <x-turnstile />
-                @endif
+                <x-core::captcha.widgets />
 
                 <div class="flex w-full justify-start md:justify-end">
                     <x-theme-atom::form.secondary-button classes="lg:w-1/4">
