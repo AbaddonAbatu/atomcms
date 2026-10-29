@@ -1,7 +1,7 @@
 <x-app-layout>
     @push('title', __('Shop'))
 
-    <div class="col-span-12 ">
+    <div class="col-span-12 " x-init="$nextTick(() => $dispatch('shop:loaded'))">
         <x-theme-dusk::modals.modal-wrapper>
             <div class="w-full py-2 px-4 text-center bg-[#f68b08] text-white rounded">
                 {{ __('Please make sure to read our shop') }}
@@ -138,9 +138,4 @@
         </div>
     </div>
 
-    @push('javascript')
-        <script type="module">
-            tippy('.user-badge');
-        </script>
-    @endpush
 </x-app-layout>

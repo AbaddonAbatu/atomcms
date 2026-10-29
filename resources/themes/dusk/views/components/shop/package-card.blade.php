@@ -49,12 +49,15 @@
     </div>
 
     @auth
-        <div class="pt-4 mt-auto flex gap-4" x-data="{
-            confirmOpen: false,
-            confirmAction: '',
-            confirmReceiver: '',
-            confirmMessage: '',
-        }">
+        @php
+            $purchaseOptions = [
+                'action' => route('shop.buy-package', $package),
+                'giftMessage' => __('You are about to gift :package to', ['package' => $package->name]),
+                'chargeMessage' => __('You will be charged :cost. This action is non-refundable.', ['cost' => $package->formattedPrice()]),
+                'purchaseMessage' => __('You are about to purchase :package for :cost. This action is non-refundable. Are you sure?', ['package' => $package->name, 'cost' => $package->formattedPrice()]),
+            ];
+        @endphp
+        <div class="pt-4 mt-auto flex gap-4" x-data="packagePurchase(@js($purchaseOptions))">
             <div class="w-full flex gap-2">
                 @if($package->is_giftable)
                     <x-theme-dusk::modals.modal-wrapper>
@@ -71,60 +74,10 @@
                                 </h2>
                             </x-slot>
 
-                            <div class="mt-4" x-data="{
-                                query: '',
-                                results: [],
-                                activeIndex: -1,
-                                showDropdown: false,
-                                loading: false,
-                                debounceTimer: null,
-                                search() {
-                                    clearTimeout(this.debounceTimer);
-                                    if (this.query.length < 2) {
-                                        this.results = [];
-                                        this.showDropdown = false;
-                                        return;
-                                    }
-                                    this.loading = true;
-                                    this.debounceTimer = setTimeout(async () => {
-                                        const response = await fetch(`/api/users/search?q=${encodeURIComponent(this.query)}`);
-                                        this.results = await response.json();
-                                        this.showDropdown = this.results.length > 0;
-                                        this.activeIndex = -1;
-                                        this.loading = false;
-                                    }, 250);
-                                },
-                                select(username) {
-                                    this.query = username;
-                                    this.showDropdown = false;
-                                    this.activeIndex = -1;
-                                },
-                                handleKeydown(event) {
-                                    if (!this.showDropdown) return;
-                                    if (event.key === 'ArrowDown') {
-                                        event.preventDefault();
-                                        this.activeIndex = (this.activeIndex + 1) % this.results.length;
-                                    } else if (event.key === 'ArrowUp') {
-                                        event.preventDefault();
-                                        this.activeIndex = this.activeIndex <= 0 ? this.results.length - 1 : this.activeIndex - 1;
-                                    } else if (event.key === 'Enter' && this.activeIndex >= 0) {
-                                        event.preventDefault();
-                                        this.select(this.results[this.activeIndex].username);
-                                    } else if (event.key === 'Tab' && this.activeIndex >= 0) {
-                                        event.preventDefault();
-                                        this.select(this.results[this.activeIndex].username);
-                                    } else if (event.key === 'Escape') {
-                                        this.showDropdown = false;
-                                        this.activeIndex = -1;
-                                    }
-                                },
-                            }">
+                            <div class="mt-4" x-data="recipientSearch()">
                                 <form x-ref="giftForm" action="{{ route('shop.buy-package', $package) }}" method="POST" class="w-full"
                                       x-on:submit.prevent="
-                                          if (!query.trim()) return;
-                                          confirmAction = '{{ route('shop.buy-package', $package) }}';
-                                          confirmReceiver = query;
-                                          confirmMessage = '{{ __('You are about to gift :package to', ['package' => $package->name]) }} ' + query + '. {{ __('You will be charged :cost. This action is non-refundable.', ['cost' => $package->formattedPrice()]) }}';
+                                          if (!prepareGift(query)) return;
                                           open = false;
                                           $nextTick(() => { confirmOpen = true; });
                                       ">
@@ -185,12 +138,7 @@
             </div>
 
             <form x-ref="buyForm" action="{{ route('shop.buy-package', $package) }}" method="POST"
-                  x-on:submit.prevent="
-                      confirmAction = '{{ route('shop.buy-package', $package) }}';
-                      confirmReceiver = '';
-                      confirmMessage = '{{ __('You are about to purchase :package for :cost. This action is non-refundable. Are you sure?', ['package' => $package->name, 'cost' => $package->formattedPrice()]) }}';
-                      confirmOpen = true;
-                  ">
+                  x-on:submit.prevent="preparePurchase()">
                 @csrf
 
                 <x-theme-dusk::form.secondary-button type="submit" classes="text-green-100 px-4">
