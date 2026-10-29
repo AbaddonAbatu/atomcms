@@ -45,7 +45,13 @@
             {{-- Used to determine the refer --}}
             <input type="hidden" name="referral_code" value="{{ $referral_code }}">
 
-           <x-theme-dusk::site-captchas />
+            <div class="w-full flex mt-3 justify-start">
+                <div class="mt-4">
+                    <x-core::captcha.widgets :turnstile="false" />
+                </div>
+
+                <x-core::captcha.widgets :recaptcha="false" />
+            </div>
 
             <div class="mt-4 grid grid-cols-2 gap-3">
                 <button type="submit" class="py-2 px-4 text-white bg-yellow-500 border-2 border-yellow-300 w-full rounded-md transition duration-300 ease-in-out hover:scale-[102%]">{{ __('Register') }}</button>

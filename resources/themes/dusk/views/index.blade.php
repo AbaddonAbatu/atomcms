@@ -16,7 +16,13 @@
 
             <input type="password" placeholder="{{ __('Enter your password') }}" name="password" class="relative py-2 rounded-md mt-3 text-black w-full">
 
-            <x-theme-dusk::site-captchas />
+            <div class="w-full flex mt-3 justify-start">
+                <div class="mt-4">
+                    <x-core::captcha.widgets :turnstile="false" />
+                </div>
+
+                <x-core::captcha.widgets :recaptcha="false" />
+            </div>
 
             <div class="mt-4 flex gap-4">
                 <button type="submit" class="py-2 px-4 text-white bg-yellow-500 border-2 border-yellow-300 w-full rounded-md transition duration-300 ease-in-out hover:scale-[102%]">{{ __('Login') }}</button>
