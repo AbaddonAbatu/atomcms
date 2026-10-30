@@ -2,8 +2,11 @@
 
 use App\Data\ThemeDefinition;
 use App\Exceptions\ThemePresentationException;
+use App\Services\ThemeService;
 use App\Services\ThemeValidator;
+use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\View;
 
 /**
  * @param  list<string>  $views
@@ -87,6 +90,38 @@ test('external theme roots stay absolute and hot paths are computed at call time
     expect($theme->hotFile())->toBe(storage_path('vite/aurora.hot'));
 });
 
+test('a source-less production theme can activate with only the core views and its compiled build', function (): void {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    $source = writeThemeFixture($this->themeRoot, views: [
+        'index', 'auth.login', 'auth.register', 'auth.passwords.forget', 'auth.passwords.reset', 'auth.passwords.confirm', 'auth.two-factor-challenge',
+        'user.me', 'user.settings.account', 'user.settings.password', 'user.settings.two-factor', 'banned', 'maintenance', 'client.nitro',
+    ]);
+    File::put($source . '/views/index.blade.php', '<!doctype html><html><head>{{ theme_vite() }}</head><body>Source-free theme</body></html>');
+    $theme = freshThemeValidator()->definition('aurora');
+    $build = public_path($theme->buildDirectory());
+    File::ensureDirectoryExists($build . '/assets');
+    File::put($build . '/assets/app.css', '');
+    File::put($build . '/assets/app.js', '');
+    File::put($build . '/manifest.json', json_encode([
+        $theme->viteEntrypoints()[0] => ['file' => 'assets/app.css', 'src' => $theme->viteEntrypoints()[0], 'isEntry' => true],
+        $theme->viteEntrypoints()[1] => ['file' => 'assets/app.js', 'src' => $theme->viteEntrypoints()[1], 'isEntry' => true],
+    ], JSON_THROW_ON_ERROR));
+    File::delete([$source . '/css/app.css', $source . '/js/app.js']);
+
+    expect(freshThemeValidator()->activationProblems('aurora', true))->toBe([]);
+
+    installHotel();
+    setSetting('theme', 'aurora');
+    View::replaceNamespace($theme->namespace(), [$theme->viewPath()]);
+    app()->forgetInstance(ThemeService::class);
+    $this->withVite();
+    app()->forgetInstance(Vite::class);
+
+    $this->get(route('welcome'))->assertOk()
+        ->assertSee('http://localhost/build/themes/aurora/assets/app.css', escape: false)
+        ->assertSee('http://localhost/build/themes/aurora/assets/app.js', escape: false);
+});
+
 test('discovery ignores files and missing roots and memoizes per instance', function () {
     config(['theme.base_path' => $this->themeRoot . '/missing']);
     $missingValidator = freshThemeValidator();
@@ -118,7 +153,9 @@ test('selectable IDs are the well-formed themes, with or without their views and
     File::ensureDirectoryExists($this->themeRoot . '/empty');
     $validator = freshThemeValidator();
 
-    expect($validator->selectableIds())->toBe(['alpha', 'empty', 'zebra']);
+    expect($validator->selectableIds())->toBe(['alpha', 'empty', 'zebra'])
+        ->and($validator->missingViews($validator->definition('alpha')))->not->toBe([])
+        ->and($validator->assetProblems($validator->definition('alpha'), production: true))->not->toBe([]);
 });
 
 test('invalid and reserved theme IDs do not hide valid siblings', function (string $id, string $problem) {
@@ -147,6 +184,7 @@ test('folders are discovered without manifests, views or source assets', functio
     expect($validator->rejected())->toBe([]);
     expect(array_keys($validator->definitions()))->toBe(['aurora', 'other']);
     expect($validator->definition('aurora')->id)->toBe('aurora');
+    expect($validator->activationProblems('aurora', true))->not->toBe([]);
 });
 
 test('legacy JSON manifests are ignored during discovery', function (string $json) {
@@ -230,4 +268,199 @@ test('unknown and rejected definitions throw precise diagnostics', function () {
 
     expect(fn () => $validator->definition('missing'))->toThrow(ThemePresentationException::class, 'Theme [missing] is not installed.');
     expect(fn () => $validator->definition('Bad_Theme'))->toThrow(ThemePresentationException::class, 'Theme [Bad_Theme] is invalid: Invalid theme ID [Bad_Theme]; use lowercase letters, digits and single hyphens, starting with a letter.');
+});
+
+test('all required views satisfy the contract without the optional groups widget', function () {
+    writeThemeFixture($this->themeRoot, views: ThemeValidator::REQUIRED_VIEWS);
+    $validator = freshThemeValidator();
+
+    expect(ThemeValidator::REQUIRED_VIEWS)->toHaveCount(14);
+    expect($validator->missingViews($validator->definition('aurora')))->toBe([]);
+    expect(File::exists($this->themeRoot . '/aurora/views/home/widgets/my-groups.blade.php'))->toBeFalse();
+});
+
+test('missing views cannot be supplied by a sibling theme or the root view finder', function () {
+    $path = writeThemeFixture($this->themeRoot, views: ThemeValidator::REQUIRED_VIEWS);
+    writeThemeFixture($this->themeRoot, 'other', views: ['auth.passwords.reset']);
+    File::delete($path . '/views/auth/passwords/reset.blade.php');
+    $rootFixture = $this->themeTemporaryPath . '/root-view';
+    File::ensureDirectoryExists($rootFixture . '/auth/passwords');
+    File::put($rootFixture . '/auth/passwords/reset.blade.php', 'Root fixture');
+    view()->getFinder()->addLocation($rootFixture);
+    $validator = freshThemeValidator();
+    $theme = $validator->definition('aurora');
+
+    expect(view('auth.passwords.reset')->render())->toBe('Root fixture');
+    expect($validator->missingViews($theme))->toBe([
+        'auth.passwords.reset' => str_replace('\\', '/', realpath($path)) . '/views/auth/passwords/reset.blade.php',
+    ]);
+});
+
+test('bundled themes provide every required view in their own root', function () {
+    config(['theme.base_path' => resource_path('themes')]);
+    $validator = freshThemeValidator();
+
+    foreach (['atom', 'dusk'] as $id) {
+        expect($validator->missingViews($validator->definition($id)))->toBe([]);
+    }
+});
+
+test('assets require a build manifest when there is no hot file', function () {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    writeThemeFixture($this->themeRoot);
+    $validator = freshThemeValidator();
+
+    expect($validator->assetProblems($validator->definition('aurora'), false))->toBe([
+        'Missing build manifest ' . str_replace('\\', '/', public_path('build/themes/aurora/manifest.json')) . '.',
+    ]);
+});
+
+test('build manifests must decode to JSON objects', function (string $json, string $message) {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    writeThemeFixture($this->themeRoot);
+    File::ensureDirectoryExists(public_path('build/themes/aurora'));
+    $path = public_path('build/themes/aurora/manifest.json');
+    File::put($path, $json);
+    $validator = freshThemeValidator();
+
+    expect($validator->assetProblems($validator->definition('aurora'), false))->toBe([
+        str_replace(':path', str_replace('\\', '/', $path), $message),
+    ]);
+})->with([
+    'malformed' => ['{', 'Cannot read build manifest :path: Syntax error.'],
+    'list' => ['[]', 'Build manifest :path must be a JSON object.'],
+    'scalar' => ['true', 'Build manifest :path must be a JSON object.'],
+]);
+
+test('build manifests must contain every fully qualified entrypoint', function (string $entrypoint): void {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    writeThemeFixture($this->themeRoot);
+    $validator = freshThemeValidator();
+    $theme = $validator->definition('aurora');
+    $path = public_path('build/themes/aurora/manifest.json');
+    File::ensureDirectoryExists(dirname($path));
+    $manifest = array_fill_keys($theme->viteEntrypoints(), ['file' => 'app.js']);
+    unset($manifest[$theme->sourceDirectory() . '/' . $entrypoint]);
+    File::put($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    expect($validator->assetProblems($theme, false))->toBe([
+        'Build manifest ' . str_replace('\\', '/', $path) . ' has no entry for ' . $theme->sourceDirectory() . '/' . $entrypoint . '.',
+    ]);
+
+    File::put($path, json_encode(array_fill_keys($theme->viteEntrypoints(), ['file' => 'app.js']), JSON_THROW_ON_ERROR));
+    expect($validator->assetProblems($theme, false))->toBe([]);
+    expect($validator->assetProblems($theme, true))->toBe([]);
+})->with(['css/app.css', 'js/app.js']);
+
+test('build manifest entrypoints require a string emitted file', function (string $entrypoint, mixed $entry): void {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    writeThemeFixture($this->themeRoot);
+    $validator = freshThemeValidator();
+    $theme = $validator->definition('aurora');
+    $path = public_path('build/themes/aurora/manifest.json');
+    File::ensureDirectoryExists(dirname($path));
+    $manifest = array_fill_keys($theme->viteEntrypoints(), ['file' => 'app.js']);
+    $manifest[$theme->sourceDirectory() . '/' . $entrypoint] = $entry;
+    File::put($path, json_encode($manifest, JSON_THROW_ON_ERROR));
+
+    expect($validator->assetProblems($theme, true))->toBe([
+        'Build manifest ' . str_replace('\\', '/', $path) . ' entry ' . $theme->sourceDirectory() . '/' . $entrypoint . ' has no emitted file.',
+    ]);
+})->with(['css/app.css', 'js/app.js'])->with([
+    'missing file' => [(object) []],
+    'null file' => [['file' => null]],
+    'non-string file' => [['file' => 123]],
+    'non-object entry' => ['app.js'],
+]);
+
+test('a hot file is proof only in development and must be removed for deployment', function () {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    writeThemeFixture($this->themeRoot);
+    $validator = freshThemeValidator();
+    $theme = $validator->definition('aurora');
+    File::put($theme->hotFile(), 'http://localhost:5173');
+
+    expect($validator->assetProblems($theme, false))->toBe([]);
+    expect($validator->assetProblems($theme, true))->toBe([
+        'Remove the development hot file ' . str_replace('\\', '/', $theme->hotFile()) . ' before deploying.',
+        'Missing build manifest ' . str_replace('\\', '/', public_path('build/themes/aurora/manifest.json')) . '.',
+    ]);
+
+    $path = public_path('build/themes/aurora/manifest.json');
+    File::ensureDirectoryExists(dirname($path));
+    File::put(dirname($path) . '/app.js', '');
+    File::put($path, json_encode(array_fill_keys($theme->viteEntrypoints(), ['file' => 'app.js']), JSON_THROW_ON_ERROR));
+    expect($validator->assetProblems($theme, true))->toBe([
+        'Remove the development hot file ' . str_replace('\\', '/', $theme->hotFile()) . ' before deploying.',
+    ]);
+});
+
+test('validation command reports all candidates and can select a single valid theme', function () {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    writeThemeFixture($this->themeRoot, views: ThemeValidator::REQUIRED_VIEWS);
+    File::ensureDirectoryExists($this->themeRoot . '/Bad_Theme');
+    File::put(storage_path('vite/aurora.hot'), 'http://localhost:5173');
+
+    $this->artisan('atom:themes:validate')
+        ->expectsOutput('aurora: valid')
+        ->expectsOutput('Bad_Theme: rejected (not selected, ignored)')
+        ->expectsOutput('Invalid theme ID [Bad_Theme]; use lowercase letters, digits and single hyphens, starting with a letter.')
+        ->assertSuccessful();
+
+    setSetting('theme', 'Bad_Theme');
+
+    $this->artisan('atom:themes:validate')
+        ->expectsOutput('aurora: valid')
+        ->expectsOutput('Bad_Theme: rejected')
+        ->assertFailed();
+
+    $this->artisan('atom:themes:validate', ['theme' => 'aurora'])
+        ->expectsOutput('aurora: valid')
+        ->doesntExpectOutput('Bad_Theme: rejected')
+        ->assertSuccessful();
+
+    $this->artisan('atom:themes:validate', ['theme' => 'Bad_Theme'])
+        ->expectsOutput('Bad_Theme: rejected')
+        ->expectsOutput('Invalid theme ID [Bad_Theme]; use lowercase letters, digits and single hyphens, starting with a letter.')
+        ->doesntExpectOutput('aurora: valid')
+        ->assertFailed();
+});
+
+test('production command rejects a development-only theme', function () {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    writeThemeFixture($this->themeRoot, views: ThemeValidator::REQUIRED_VIEWS);
+    File::put(storage_path('vite/aurora.hot'), 'http://localhost:5173');
+
+    $this->artisan('atom:themes:validate', ['theme' => 'aurora', '--production' => true])
+        ->expectsOutput('aurora: 2 problem(s)')
+        ->expectsOutput('Remove the development hot file ' . str_replace('\\', '/', storage_path('vite/aurora.hot')) . ' before deploying.')
+        ->expectsOutput('Missing build manifest ' . str_replace('\\', '/', public_path('build/themes/aurora/manifest.json')) . '.')
+        ->assertFailed();
+});
+
+test('validation command rejects unknown theme IDs without fallback', function () {
+    $this->artisan('atom:themes:validate', ['theme' => 'unknown'])
+        ->expectsOutput('Theme [unknown] is not installed.')
+        ->assertFailed();
+});
+
+test('validation reports a theme\'s own missing view when a sibling provides it', function () {
+    useThemeAssetFixturePaths($this->themeTemporaryPath);
+    $missingView = 'banned';
+    $fixtureViews = array_values(array_diff(ThemeValidator::REQUIRED_VIEWS, [$missingView]));
+    $fixture = writeThemeFixture($this->themeRoot, 'aurora', views: $fixtureViews);
+    writeThemeFixture($this->themeRoot, 'other', views: [$missingView]);
+    app()->forgetInstance(ThemeValidator::class);
+    $missingPath = str_replace('\\', '/', realpath($fixture) . '/views/banned.blade.php');
+
+    $this->artisan('atom:themes:validate', ['theme' => 'aurora'])
+        ->expectsOutput('Missing view [banned]: ' . $missingPath)
+        ->assertFailed();
+
+    config(['theme.base_path' => resource_path('themes')]);
+    $validator = freshThemeValidator();
+
+    foreach (['atom', 'dusk'] as $id) {
+        expect($validator->missingViews($validator->definition($id)))->toBe([]);
+    }
 });

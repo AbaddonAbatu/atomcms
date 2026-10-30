@@ -514,6 +514,7 @@
     "Turkish": "Turkki",
     "Service Unavailable": "Palvelu ei ole käytettävissä",
     "The site is temporarily unavailable. Please try again later.": "Sivusto ei ole tilapäisesti käytettävissä. Yritä myöhemmin uudelleen.",
+    "This theme cannot be activated: :problem": "Tätä teemaa ei voi ottaa käyttöön: :problem",
     "If you did not request this, you can ignore this email.": "Jos et pyytänyt tätä, voit jättää tämän sähköpostin huomiotta.",
     ":hotel teams": ":hotel-tiimit",
     "About the :hotel teams": "Tietoa :hotel-tiimeistä",

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Miscellaneous\WebsiteInstallation;
 use App\Models\Miscellaneous\WebsiteSetting;
+use App\Rules\ActivatableTheme;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -11,12 +12,20 @@ use Illuminate\Support\Str;
 
 final class InstallationSetup
 {
-    /** @return array<string, array<int, string>> */
+    public function __construct(private readonly ThemeValidator $themes) {}
+
+    /**
+     * The `in:` rules stay plain strings: atom:setup reads them to offer a
+     * choice for each setting.
+     *
+     * @return array<string, array<int, string|ActivatableTheme>>
+     */
     public function rules(): array
     {
         $rules = [
             'hotel_name' => ['sometimes', 'required', 'string', 'max:100'],
             'cms_color_mode' => ['sometimes', 'in:light,dark'],
+            'theme' => ['sometimes', 'required', 'bail', 'in:' . implode(',', $this->themes->selectableIds()), new ActivatableTheme],
         ];
         foreach (['start_credits', 'start_duckets', 'start_diamonds', 'start_points', 'max_accounts_per_ip', 'max_comment_per_article'] as $key) {
             $rules[$key] = ['sometimes', 'integer', 'min:0', 'max:2147483647'];

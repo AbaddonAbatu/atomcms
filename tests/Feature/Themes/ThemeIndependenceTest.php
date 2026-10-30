@@ -2,6 +2,7 @@
 
 use App\Data\ThemeDefinition;
 use App\Exceptions\ThemePresentationException;
+use App\Filament\Resources\Atom\CmsSettings\Pages\ManageCmsSettings;
 use App\Mail\ResetPasswordMail;
 use App\Models\Articles\WebsiteArticle;
 use App\Models\Community\RareValue\WebsiteRareValue;
@@ -23,6 +24,9 @@ use App\Services\Auth\AuthPageService;
 use App\Services\SettingsService;
 use App\Services\ThemeService;
 use App\Services\ThemeValidator;
+use Filament\Actions\EditAction;
+use Filament\Actions\Testing\TestAction;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -30,6 +34,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Testing\TestResponse;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -563,6 +568,16 @@ function auroraLivewireSnapshot(string $html, string $component): array
     throw new RuntimeException("The Aurora page did not render the {$component} component.");
 }
 
+function auroraEditThemeSetting(string $value): Testable
+{
+    $record = WebsiteSetting::query()->where('key', 'theme')->firstOrFail();
+
+    Filament::setCurrentPanel(Filament::getPanel('housekeeping'));
+
+    return Livewire::test(ManageCmsSettings::class)
+        ->callAction(TestAction::make(EditAction::class)->table($record), data: ['value' => $value]);
+}
+
 test('Aurora is the only discovered fixture and root public views are absent', function (): void {
     $definitions = app(ThemeValidator::class)->definitions();
 
@@ -582,6 +597,37 @@ test('Aurora is the only discovered fixture and root public views are absent', f
     foreach ($deletedRootViews as $view) {
         expect(File::exists(resource_path('views/' . $view)))->toBeFalse($view);
     }
+});
+
+test('housekeeping activates Aurora and the theme validator accepts it', function (): void {
+    auroraStoreThemeSetting('atom');
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    grantHousekeepingPermission('manage_website_settings', 6);
+    $this->actingAs(User::factory()->create(['rank' => 6]));
+
+    auroraEditThemeSetting('aurora')->assertHasNoActionErrors();
+
+    expect(setting('theme'))->toBe('aurora');
+    $this->artisan('atom:themes:validate', ['theme' => 'aurora'])->assertSuccessful();
+});
+
+test('housekeeping accepts an omitted non-core page and its route returns 404', function (): void {
+    auroraStoreThemeSetting('atom');
+    grantHousekeepingPermission('can_access_housekeeping', 6);
+    grantHousekeepingPermission('manage_website_settings', 6);
+    $this->actingAs(User::factory()->create(['rank' => 6]));
+    File::delete($this->auroraThemePath . '/views/community/article.blade.php');
+    auroraRegisterThemeRuntime($this->auroraEmptyPath, $this->auroraEmptyPath);
+
+    auroraEditThemeSetting('aurora')->assertHasNoActionErrors();
+    expect(setting('theme'))->toBe('aurora');
+    $this->artisan('atom:themes:validate', ['theme' => 'aurora'])
+        ->assertSuccessful();
+
+    auroraStoreThemeSetting('aurora');
+    $this->get(route('article.index'))->assertOk()->assertViewIs('theme-aurora::community.articles');
+    $article = WebsiteArticle::create(['user_id' => User::factory()->create()->id, 'title' => 'Missing page', 'short_story' => 'Short', 'full_story' => '<p>Story</p>', 'image' => 'a.png']);
+    $this->get(route('article.show', $article->slug))->assertNotFound();
 });
 
 test('Aurora owns every public page in the presentation matrix', function (Closure $prepare, Closure $request, string $expected, bool $standalone): void {

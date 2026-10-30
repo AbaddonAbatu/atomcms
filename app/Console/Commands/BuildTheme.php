@@ -46,6 +46,17 @@ class BuildTheme extends Command
             return Command::FAILURE;
         }
 
+        if (! in_array($selection, ['core', 'housekeeping'], true)) {
+            $problems = $validator->buildProblems($validator->definition($selection));
+            if ($problems !== []) {
+                foreach ($problems as $problem) {
+                    $this->error($problem);
+                }
+
+                return Command::FAILURE;
+            }
+        }
+
         try {
             $package = File::json(base_path('package.json'));
         } catch (Throwable $exception) {

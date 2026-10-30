@@ -4,7 +4,10 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\ReadsStringInputs;
 use App\Emulator\EmulatorManager;
+use App\Services\InstallationSetup;
 use App\Services\OperatingMode;
+use App\Services\SettingsService;
+use App\Services\ThemeValidator;
 use App\Support\EnvironmentFile;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -44,8 +47,6 @@ class AtomInstallCommand extends Command
         {--admin= : Username of the administrator to create or promote}';
 
     protected $description = 'One-command installer for a supported emulator';
-
-    private const THEMES = ['atom', 'dusk'];
 
     public function handle(EmulatorManager $emulators): int
     {
@@ -364,34 +365,26 @@ class AtomInstallCommand extends Command
 
     private function setUpTheme(): void
     {
+        $themes = app(ThemeValidator::class)->selectableIds();
         $seeded = DB::table('website_settings')->where('key', 'theme')->value('value');
+        $current = in_array($seeded, $themes, true) ? $seeded : (string) config('theme.default');
 
         $theme = $this->stringOption('theme');
 
-        if ($theme !== null && ! in_array($theme, self::THEMES, true)) {
-            warning("Unknown theme '{$theme}' - expected one of: " . implode(', ', self::THEMES) . '. Keeping the current theme.');
+        if ($theme !== null && ! in_array($theme, $themes, true)) {
+            warning("Unknown theme '{$theme}' - expected one of: " . implode(', ', $themes) . '. Keeping the current theme.');
             $theme = null;
         }
 
         if ($theme === null && $this->input->isInteractive()) {
-            $selectedTheme = $this->choice(
-                'Which theme do you want to use?',
-                self::THEMES,
-                in_array($seeded, self::THEMES, true) ? $seeded : 'atom',
-            );
+            $selectedTheme = $this->choice('Which theme do you want to use?', $themes, $current);
 
             if (is_string($selectedTheme)) {
                 $theme = $selectedTheme;
             }
         }
 
-        $theme ??= in_array($seeded, self::THEMES, true) ? $seeded : 'atom';
-
-        if ($theme !== $seeded) {
-            DB::table('website_settings')->where('key', 'theme')->update(['value' => $theme]);
-        }
-
-        info("Active theme set to '{$theme}'.");
+        $theme ??= $current;
 
         if ($this->option('skip-build')) {
             note('Skipping the asset build - run these yourself: npm run build:' . $theme . ', npm run build:core, and npm run build:housekeeping.');
@@ -411,6 +404,36 @@ class AtomInstallCommand extends Command
             }
         }
 
+        if ($theme === $seeded) {
+            info("Active theme set to '{$theme}'.");
+
+            return;
+        }
+
+        // A skipped build defers only the asset checks; the views must be complete now.
+        $validator = app(ThemeValidator::class);
+        $deferBuild = (bool) $this->option('skip-build');
+        $problems = $deferBuild
+            ? $validator->viewProblems($validator->definition($theme))
+            : $validator->activationProblems($theme, app()->isProduction());
+
+        if ($problems !== []) {
+            warning("Theme '{$theme}' cannot be activated yet - keeping the current theme. Fix the problems below, then select it with atom:setup or in housekeeping.");
+            $this->line(implode(PHP_EOL, $problems));
+
+            return;
+        }
+
+        if ($deferBuild) {
+            DB::table('website_settings')->where('key', 'theme')->update(['value' => $theme]);
+            app(SettingsService::class)->refresh();
+            info("Active theme set to '{$theme}'. Build its assets before serving the site.");
+
+            return;
+        }
+
+        app(InstallationSetup::class)->configure(['theme' => $theme]);
+        info("Active theme set to '{$theme}'.");
     }
 
     private function linkStorage(): void

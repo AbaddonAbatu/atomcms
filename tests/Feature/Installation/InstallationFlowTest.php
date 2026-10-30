@@ -305,6 +305,36 @@ test('saving a step only writes the settings that belong to it', function () {
         ->and(WebsiteSetting::where('key', $laterStepKey)->value('value'))->toBe($laterStepValue);
 });
 
+test('the theme step rejects a theme that is not installed and keeps the stored one', function () {
+    installHotel();
+    setSetting('theme', 'atom');
+    $step = openInstallationStepFor('theme');
+
+    $this->from(route('installation.show-step', $step))
+        ->post(route('installation.save-step'), ['theme' => 'missing'])
+        ->assertRedirect(route('installation.show-step', $step))
+        ->assertSessionHasErrors('theme');
+
+    expect(WebsiteSetting::where('key', 'theme')->value('value'))->toBe('atom')
+        ->and(setting('theme'))->toBe('atom')
+        ->and(WebsiteInstallation::first()->step)->toBe($step);
+});
+
+test('the theme step saves an installed theme and the new value is visible straight away', function () {
+    installHotel();
+    setSetting('theme', 'atom');
+    $step = openInstallationStepFor('theme');
+
+    expect(setting('theme'))->toBe('atom');
+
+    $this->post(route('installation.save-step'), ['theme' => 'dusk'])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('installation.show-step', $step + 1));
+
+    expect(WebsiteSetting::where('key', 'theme')->value('value'))->toBe('dusk')
+        ->and(setting('theme'))->toBe('dusk');
+});
+
 test('restarting the installation resets the theme to the configured default', function () {
     installHotel();
     config(['theme.default' => 'dusk']);

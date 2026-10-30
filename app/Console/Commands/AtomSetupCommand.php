@@ -34,7 +34,7 @@ class AtomSetupCommand extends Command
                 $default = (string) setting($key, '');
                 $choices = null;
                 foreach ($rules as $rule) {
-                    if (str_starts_with($rule, 'in:')) {
+                    if (is_string($rule) && str_starts_with($rule, 'in:')) {
                         $choices = explode(',', substr($rule, 3));
                     }
                 }

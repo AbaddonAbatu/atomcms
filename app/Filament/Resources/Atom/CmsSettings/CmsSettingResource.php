@@ -6,11 +6,13 @@ use App\Filament\Concerns\TranslatableResource;
 use App\Filament\Resources\Atom\CmsSettings\Pages\ManageCmsSettings;
 use App\Filament\Support\TruncatedTooltip;
 use App\Models\Miscellaneous\WebsiteSetting;
+use App\Rules\ActivatableTheme;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -46,7 +48,10 @@ class CmsSettingResource extends Resource
                             ->label(__('filament::resources.inputs.value'))
                             ->required()
                             ->maxLength(255)
-                            ->autocomplete(),
+                            ->autocomplete()
+                            ->rules(fn (Get $get): array => $get('key') === 'theme'
+                                ? [new ActivatableTheme]
+                                : []),
 
                         TextInput::make('comment')
                             ->label(__('filament::resources.inputs.comment'))
