@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="mr-8 hidden items-center lg:flex">
-                        <img src="{{ asset('/assets/images/angry_frank.png') }}" alt="">
+                        <img src="{{ theme_asset('images/angry_frank.png') }}" alt="">
                     </div>
                 </div>
             </div>

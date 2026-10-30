@@ -7,6 +7,7 @@ export default defineConfig({
     plugins: [laravel({
         input: ["resources/css/filament/housekeeping/theme.css"],
         buildDirectory: "build-housekeeping",
+        hotFile: "storage/vite/housekeeping.hot",
     })],
     css: { postcss: { plugins: [tailwindcss(), autoprefixer()] } },
 });

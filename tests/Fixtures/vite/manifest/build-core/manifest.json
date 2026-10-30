@@ -1,0 +1,12 @@
+{
+  "resources/css/global.css": {
+    "file": "assets/global-fixture.css",
+    "src": "resources/css/global.css",
+    "isEntry": true
+  },
+  "resources/js/global.js": {
+    "file": "assets/global-fixture.js",
+    "src": "resources/js/global.js",
+    "isEntry": true
+  }
+}

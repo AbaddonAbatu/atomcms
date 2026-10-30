@@ -32,6 +32,14 @@ function freshThemeValidator(): ThemeValidator
     return app()->make(ThemeValidator::class);
 }
 
+function useThemeAssetFixturePaths(string $temporary): void
+{
+    app()->usePublicPath($temporary . '/public');
+    app()->useStoragePath($temporary . '/storage');
+    File::ensureDirectoryExists(public_path());
+    File::ensureDirectoryExists(storage_path('vite'));
+}
+
 beforeEach(function () {
     $this->themeTemporaryPath = sys_get_temp_dir() . '/atom-theme-contract-' . bin2hex(random_bytes(12));
     $this->themeRoot = $this->themeTemporaryPath . '/themes';
@@ -62,9 +70,21 @@ test('bundled themes use folder names and conventional asset paths', function ()
         expect($theme->viewPath())->toBe($theme->path . DIRECTORY_SEPARATOR . 'views');
         expect($theme->componentPath())->toBe($theme->viewPath() . DIRECTORY_SEPARATOR . 'components');
         expect($theme->sourceDirectory())->toBe('resources/themes/' . $id);
+        expect($theme->buildDirectory())->toBe('build/themes/' . $id);
+        expect(str_replace('\\', '/', $theme->hotFile()))->toEndWith('/storage/vite/' . $id . '.hot');
         expect($theme->entrypoints())->toBe(['css/app.css', 'js/app.js']);
+        expect($theme->viteEntrypoints())->toBe(['resources/themes/' . $id . '/css/app.css', 'resources/themes/' . $id . '/js/app.js']);
         expect($theme->viewFile('auth.passwords.reset'))->toBe('resources/themes/' . $id . '/views/auth/passwords/reset.blade.php');
     }
+});
+
+test('external theme roots stay absolute and hot paths are computed at call time', function () {
+    writeThemeFixture($this->themeRoot);
+    $theme = freshThemeValidator()->definition('aurora');
+
+    expect($theme->sourceDirectory())->toBe(str_replace('\\', '/', realpath($this->themeRoot . '/aurora')));
+    app()->useStoragePath($this->themeTemporaryPath . '/changed-storage');
+    expect($theme->hotFile())->toBe(storage_path('vite/aurora.hot'));
 });
 
 test('discovery ignores files and missing roots and memoizes per instance', function () {
@@ -154,6 +174,23 @@ test('legacy metadata cannot override folder names or conventional entrypoints',
     'custom name' => [['name' => 'Another Name']],
     'custom inputs' => [['entrypoints' => ['css/missing.css']]],
     'inheritance' => [['parent' => 'other']],
+]);
+
+test('asset paths must be normalized and relative', function (string $path) {
+    expect(freshThemeValidator()->isRelativeThemePath($path))->toBeFalse();
+})->with([
+    'empty' => [''],
+    'absolute' => ['/css/app.css'],
+    'drive absolute' => ['C:/css/app.css'],
+    'drive relative' => ['C:css/app.css'],
+    'UNC' => ['//server/share/app.css'],
+    'Windows UNC' => ['\\\\server\\share\\app.css'],
+    'foreign traversal' => ['../other/css/app.css'],
+    'dot segment' => ['./css/app.css'],
+    'backslash' => ['css\\app.css'],
+    'empty segment' => ['css//app.css'],
+    'trailing slash' => ['css/app.css/'],
+    'null byte' => ["css/app.css\0"],
 ]);
 
 test('candidate symlinks cannot escape the canonical root', function () {

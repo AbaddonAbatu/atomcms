@@ -6,9 +6,15 @@ use App\Data\ThemeDefinition;
 use App\Exceptions\ThemePresentationException;
 use App\Support\FilePath;
 use Closure;
+use ErrorException;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Vite;
+use Illuminate\Foundation\ViteException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Factory;
 use InvalidArgumentException;
+use TypeError;
 
 class ThemeService
 {
@@ -74,5 +80,44 @@ class ThemeService
         }
 
         return $this->view($key, value($data));
+    }
+
+    public function vite(): HtmlString
+    {
+        $theme = $this->selected();
+
+        try {
+            return ($this->themeVite())($theme->viteEntrypoints());
+        } catch (ViteException $exception) {
+            throw ThemePresentationException::unavailableAssets($theme, $exception);
+        }
+    }
+
+    public function asset(string $path): string
+    {
+        $theme = $this->selected();
+
+        if (! $this->validator->isRelativeThemePath($path)) {
+            throw ThemePresentationException::invalidAssetPath($theme, $path);
+        }
+
+        try {
+            return $this->themeVite()->asset($theme->sourceDirectory() . '/' . $path);
+        } catch (ViteException|ErrorException|TypeError $exception) {
+            Log::warning('Theme media asset is unavailable.', ['theme' => $theme->id, 'path' => $path, 'reason' => $exception->getMessage()]);
+
+            $urlPath = implode('/', array_map('rawurlencode', explode('/', $path)));
+
+            return asset($theme->buildDirectory() . '/' . $urlPath);
+        }
+    }
+
+    private function themeVite(): Vite
+    {
+        $theme = $this->selected();
+
+        return (clone app(Vite::class))
+            ->useHotFile($theme->hotFile())
+            ->useBuildDirectory($theme->buildDirectory());
     }
 }

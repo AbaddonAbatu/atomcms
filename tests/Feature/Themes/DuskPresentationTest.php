@@ -192,7 +192,7 @@ test('Dusk renders an active member ban with its details and themed illustration
 
     $this->actingAs($member)->get(route('banned.show'))
         ->assertSee(['Dusk asset proof', 'Ban type:</strong> account'], false)
-        ->assertSee('/assets/images/angry_frank.png', false);
+        ->assertDontSee('/assets/images/angry_frank.png', false);
 
     assertDuskPresentationResolvedPaths();
 });

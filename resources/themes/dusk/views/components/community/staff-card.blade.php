@@ -6,7 +6,7 @@
     </div>
 
     <div class="absolute left-3 top-3">
-        <div class="w-16 h-16 rounded-full relative overflow-hidden" style="background-size: contain; background-image: url('/assets/images/dusk/me_circle_image.png')">
+        <div class="w-16 h-16 rounded-full relative overflow-hidden" style="background-size: contain; background-image: url('{{ theme_asset('images/profile/me_circle_image.png') }}')">
             <div>
                 <a href="{{ route('home.show', $user) }}"
                    class="absolute -bottom-10 drop-shadow transition duration-300 ease-in-out hover:scale-105">

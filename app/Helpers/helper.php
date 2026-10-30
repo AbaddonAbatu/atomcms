@@ -7,6 +7,7 @@ use App\Services\SettingsService;
 use App\Services\ThemeService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\HtmlString;
 
 if (! function_exists('setting')) {
     /**
@@ -101,5 +102,19 @@ if (! function_exists('theme_view')) {
     function theme_view(string $key, array $data = []): View
     {
         return app(ThemeService::class)->view($key, $data);
+    }
+}
+
+if (! function_exists('theme_vite')) {
+    function theme_vite(): HtmlString
+    {
+        return app(ThemeService::class)->vite();
+    }
+}
+
+if (! function_exists('theme_asset')) {
+    function theme_asset(string $path): string
+    {
+        return app(ThemeService::class)->asset($path);
     }
 }

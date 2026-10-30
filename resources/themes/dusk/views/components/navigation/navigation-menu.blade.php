@@ -40,7 +40,7 @@
         </button>
 
         <div id="dusk-navigation-menu" x-ref="menu" x-show="menuOpen" style="display: none;" class="flex w-full flex-col gap-3 pb-4 text-white lg:flex! lg:w-auto lg:flex-row lg:items-center lg:gap-x-14 lg:pb-0">
-            <x-theme-dusk::navigation.dropdown icon="community_icon.png" :route-group="['staff.*', 'teams.*', 'team-applications.*', 'staff-applications.*', 'values.*', 'help-center.*', 'photos.*']" :uppercase="true" :responsive="true">
+            <x-theme-dusk::navigation.dropdown icon="icons/navigation/community.png" :route-group="['staff.*', 'teams.*', 'team-applications.*', 'staff-applications.*', 'values.*', 'help-center.*', 'photos.*']" :uppercase="true" :responsive="true">
                 {{ __('Community') }}
 
                 <x-slot:children>
@@ -74,19 +74,19 @@
                 </x-slot:children>
             </x-theme-dusk::navigation.dropdown>
 
-            <x-theme-dusk::navigation.link :route="route('leaderboard.index')" icon="leaderboard_icon.png" route-group="leaderboard.*">
+            <x-theme-dusk::navigation.link :route="route('leaderboard.index')" icon="icons/navigation/leaderboards.png" route-group="leaderboard.*">
                 {{ __('Leaderboard') }}
             </x-theme-dusk::navigation.link>
 
-            <x-theme-dusk::navigation.link :route="route('article.index')" icon="news_icon.png" route-group="article.*">
+            <x-theme-dusk::navigation.link :route="route('article.index')" icon="icons/navigation/news.png" route-group="article.*">
                 {{ __('News') }}
             </x-theme-dusk::navigation.link>
 
-            <x-theme-dusk::navigation.link :route="route('shop.index')" icon="store_icon.png" route-group="shop.*">
+            <x-theme-dusk::navigation.link :route="route('shop.index')" icon="icons/navigation/shop.png" route-group="shop.*">
                 {{ __('Store') }}
             </x-theme-dusk::navigation.link>
 
-            <x-theme-dusk::navigation.dropdown icon="home_icon.png" :href="auth()->check() ? route('me.show') : route('welcome')" :route-group="['me.*', 'home.*', 'draw-badge', 'settings.*', 'welcome', 'register*']" child-classes="min-w-[150px] lg:left-auto lg:right-0" :uppercase="true" :responsive="true">
+            <x-theme-dusk::navigation.dropdown icon="icons/navigation/home.png" :href="auth()->check() ? route('me.show') : route('welcome')" :route-group="['me.*', 'home.*', 'draw-badge', 'settings.*', 'welcome', 'register*']" child-classes="min-w-[150px] lg:left-auto lg:right-0" :uppercase="true" :responsive="true">
                 {{ __('Home') }}
 
                 <x-slot:children>

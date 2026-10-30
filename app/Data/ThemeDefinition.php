@@ -32,10 +32,26 @@ final readonly class ThemeDefinition
             ?? str_replace('\\', '/', $this->path);
     }
 
+    public function buildDirectory(): string
+    {
+        return "build/themes/{$this->id}";
+    }
+
+    public function hotFile(): string
+    {
+        return storage_path("vite/{$this->id}.hot");
+    }
+
     /** @return list<string> */
     public function entrypoints(): array
     {
         return ['css/app.css', 'js/app.js'];
+    }
+
+    /** @return list<string> */
+    public function viteEntrypoints(): array
+    {
+        return array_map(fn (string $entrypoint): string => $this->sourceDirectory() . '/' . $entrypoint, $this->entrypoints());
     }
 
     public function viewFile(string $key): string

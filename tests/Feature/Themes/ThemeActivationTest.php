@@ -15,6 +15,7 @@ use App\Services\InstallationService;
 use App\Services\SettingsService;
 use App\Services\ThemeService;
 use App\Services\ThemeValidator;
+use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
@@ -32,6 +33,7 @@ beforeEach(function (): void {
     $this->activationOriginalEnvironment = app()->environment();
     $this->activationTemporaryPath = sys_get_temp_dir() . '/atom-theme-activation-' . bin2hex(random_bytes(12));
 
+    app()->usePublicPath(base_path('tests/Fixtures/vite/manifest'));
     app()->useStoragePath($this->activationTemporaryPath . '/storage');
     File::ensureDirectoryExists(storage_path('vite'));
     themeActivationUseBasePath(resource_path('themes'));
@@ -112,6 +114,25 @@ function themeActivationCompletedPaypalOrder(string $orderId): array
         ]],
     ];
 }
+
+test('a missing page template leaves unrelated pages and writes available', function (): void {
+    $root = $this->activationTemporaryPath . '/themes';
+    $theme = themeActivationWriteAurora($root);
+    File::delete($theme . '/views/auth/passwords/forget.blade.php');
+    themeActivationUseBasePath($root);
+    setSetting('theme', 'aurora');
+
+    $this->get(route('welcome'))->assertOk()->assertViewIs('theme-aurora::index');
+    $this->get(route('forgot.password.get'))->assertNotFound();
+
+    $user = User::factory()->create();
+    $category = WebsiteHelpCenterCategory::create(['name' => 'Support', 'content' => 'Support', 'position' => 1]);
+    $this->actingAs($user)->post(route('help-center.ticket.store'), [
+        'category_id' => $category->id, 'title' => 'A valid ticket title', 'content' => 'A valid ticket body',
+    ])->assertRedirect();
+
+    expect($user->tickets()->count())->toBe(1);
+});
 
 test('invalid externally written theme settings return the Core 503 diagnostic without assets', function (string $kind): void {
     if ($kind === 'rejected') {
@@ -300,6 +321,19 @@ test('public Livewire rejects a stale or invalid theme before comment and reacti
         ->and($article->reactions()->count())->toBe(0);
 });
 
+test('a render-time theme asset failure returns the Core 503 page', function (): void {
+    app()->usePublicPath($this->activationTemporaryPath . '/empty-public');
+    app()->useStoragePath($this->activationTemporaryPath . '/empty-storage');
+    File::ensureDirectoryExists(public_path());
+    File::ensureDirectoryExists(storage_path('vite'));
+    $this->withVite();
+    app()->forgetInstance(Vite::class);
+
+    $this->get(route('welcome'))
+        ->assertServiceUnavailable()
+        ->assertSee('The site is temporarily unavailable. Please try again later.');
+});
+
 test('GuestLayout renders the selected theme and never falls back to Atom', function (): void {
     expect(Blade::render('<x-guest-layout>Fixture</x-guest-layout>'))->toContain('Fixture');
 
@@ -358,22 +392,3 @@ test('public Livewire checks only its own view before a mutation', function (str
     'missing unrelated view permits comments' => ['banned', 'article-comments', ['comment' => 'Posted on an incomplete theme'], [['method' => 'postComment', 'params' => []]], true, 1, 0],
     'missing unrelated view permits reactions' => ['banned', 'article-reactions', [], [['method' => 'toggleReaction', 'params' => ['like']]], true, 0, 1],
 ]);
-
-test('a missing page template leaves unrelated pages and writes available', function (): void {
-    $root = $this->activationTemporaryPath . '/themes';
-    $theme = themeActivationWriteAurora($root);
-    File::delete($theme . '/views/auth/passwords/forget.blade.php');
-    themeActivationUseBasePath($root);
-    setSetting('theme', 'aurora');
-
-    $this->get(route('welcome'))->assertOk()->assertViewIs('theme-aurora::index');
-    $this->get(route('forgot.password.get'))->assertNotFound();
-
-    $user = User::factory()->create();
-    $category = WebsiteHelpCenterCategory::create(['name' => 'Support', 'content' => 'Support', 'position' => 1]);
-    $this->actingAs($user)->post(route('help-center.ticket.store'), [
-        'category_id' => $category->id, 'title' => 'A valid ticket title', 'content' => 'A valid ticket body',
-    ])->assertRedirect();
-
-    expect($user->tickets()->count())->toBe(1);
-});

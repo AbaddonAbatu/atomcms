@@ -1,4 +1,10 @@
 import "./bootstrap";
+
+import.meta.glob(["../images/**"], {
+    eager: true,
+    query: "?url&no-inline",
+    import: "default",
+});
 import { initFlowbite, initPopovers } from "flowbite";
 
 import { Livewire, Alpine } from "livewire";

@@ -72,6 +72,14 @@ class ThemeValidator
         return $this->definitions[$id] ?? throw ThemePresentationException::unknownTheme($id);
     }
 
+    public function isRelativeThemePath(string $path): bool
+    {
+        return ! str_contains($path, '\\')
+            && ! preg_match('/^[a-z]:/i', $path)
+            && ! str_contains($path, "\0")
+            && array_intersect(explode('/', $path), ['', '.', '..']) === [];
+    }
+
     private function discover(): void
     {
         if ($this->discovered) {

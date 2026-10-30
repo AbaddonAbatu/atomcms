@@ -1,0 +1,7 @@
+{
+  "resources/css/filament/housekeeping/theme.css": {
+    "file": "assets/housekeeping-fixture.css",
+    "src": "resources/css/filament/housekeeping/theme.css",
+    "isEntry": true
+  }
+}

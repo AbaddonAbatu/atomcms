@@ -33,4 +33,14 @@ class ThemePresentationException extends RuntimeException
     {
         return new self("Theme [{$theme->id}] resolved view [{$key}] outside its own view root [{$theme->viewPath()}]: {$path}.");
     }
+
+    public static function invalidAssetPath(ThemeDefinition $theme, string $path): self
+    {
+        return new self("Theme [{$theme->id}] asset path [{$path}] must be a normalized relative path inside the theme.");
+    }
+
+    public static function unavailableAssets(ThemeDefinition $theme, Throwable $previous): self
+    {
+        return new self("Theme [{$theme->id}] assets are unavailable: {$previous->getMessage()}", previous: $previous);
+    }
 }

@@ -1,8 +1,14 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @import "https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap";
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../../../../node_modules/flowbite";
+@source "../views";
+@source "../js";
+@source "../../../js/components/HomeManager.js";
+
+@source "../../../views/vendor/turnstile";
+
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
@@ -162,7 +168,7 @@ html.dark .camera-icon {
 }
 
 .profile-bg {
-    background: rgba(0, 0, 0, 0.5) url("/public/assets/images/profile/profile-bg.png");
+    background: rgba(0, 0, 0, 0.5) url("../images/profile/profile-bg.png");
     background-blend-mode: multiply;
 }
 
@@ -182,11 +188,11 @@ html.dark .camera-icon {
 }
 
 .site-bg {
-    background: url("/public/assets/images/background-light.jpg") no-repeat fixed right bottom;
+    background: url("../images/background-light.jpg") no-repeat fixed right bottom;
 }
 
 .app.dark .site-bg {
-    background: url("/public/assets/images/background-dark.jpg") no-repeat fixed right bottom;
+    background: url("../images/background-dark.jpg") no-repeat fixed right bottom;
 }
 
 .app.dark .swal2-popup {
@@ -208,23 +214,23 @@ html.dark .camera-icon {
 }
 
 .navigation-icon.shop {
-    background-image: url("/public/assets/images/icons/navigation/shop.png");
+    background-image: url("../images/icons/navigation/shop.png");
 }
 
 .navigation-icon.leaderboards {
-    background-image: url("/public/assets/images/icons/navigation/leaderboards.png");
+    background-image: url("../images/icons/navigation/leaderboards.png");
 }
 
 .navigation-icon.rules {
-    background-image: url("/public/assets/images/icons/navigation/rules.gif");
+    background-image: url("../images/icons/navigation/rules.gif");
 }
 
 .navigation-icon.home {
-    background-image: url("/public/assets/images/icons/navigation/home.png");
+    background-image: url("../images/icons/navigation/home.png");
 }
 
 .navigation-icon.community {
-    background-image: url("/public/assets/images/icons/navigation/community.png");
+    background-image: url("../images/icons/navigation/community.png");
 }
 
 .swiper-slide {

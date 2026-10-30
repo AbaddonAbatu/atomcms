@@ -103,11 +103,15 @@ jobs:
       - name: Test API schema validation
         run: npm run api:test
 
-      - name: Build Atom theme
-        run: npm run build:atom
+      - name: Build all frontend targets
+        run: npm run build:all
 
-      - name: Build Dusk theme
-        run: npm run build:dusk
+      - name: Check independent asset manifests
+        run: |
+          test -f public/build/themes/atom/manifest.json
+          test -f public/build/themes/dusk/manifest.json
+          test -f public/build-core/manifest.json
+          test -f public/build-housekeeping/manifest.json
 
   tests:
     name: Pest

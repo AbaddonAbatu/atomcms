@@ -53,6 +53,8 @@ See the [installation guide](docs/wiki/1.-Installing-Atom-CMS.md) for Windows, A
    npm ci
    npm run build:atom
    npm run build:dusk
+   npm run build:core
+   npm run build:housekeeping
    php artisan config:clear
    php artisan migrate --force
    php artisan storage:link

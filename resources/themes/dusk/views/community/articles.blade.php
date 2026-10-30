@@ -4,7 +4,7 @@
     <div class="col-span-12">
         <x-theme-dusk::page-header>
             <x-slot:icon>
-                <img src="{{ asset('/assets/images/dusk/news_icon.png') }}" alt="">
+                <img src="{{ theme_asset('images/icons/navigation/news.png') }}" alt="">
             </x-slot:icon>
 
             {{ __('News') }}
