@@ -8,6 +8,7 @@ beforeEach(function () {
     config([
         'habbo.site.recaptcha_site_key' => 'google-test-site-key',
         'services.turnstile.key' => 'turnstile-test-site-key',
+        'turnstile.turnstile_secret_key' => 'turnstile-test-secret-key',
     ]);
 });
 
