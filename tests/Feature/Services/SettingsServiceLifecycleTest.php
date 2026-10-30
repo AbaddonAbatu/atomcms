@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Facade;
 
 test('a validated theme write reaches another application instance on its next lifecycle', function () {
+    app()->usePublicPath(base_path('tests/Fixtures/vite/manifest'));
     installHotel();
     setSetting('theme', 'atom');
 
