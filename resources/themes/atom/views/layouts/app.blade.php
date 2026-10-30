@@ -22,7 +22,7 @@
     @livewireScriptConfig
     {{ theme_vite() }}
     @stack('scripts')
-    <x-turnstile.scripts />
+    <x-core::captcha.assets :recaptcha="false" />
 </head>
 
 <body class="flex min-h-screen flex-col site-bg dark:bg-gray-800">
@@ -97,11 +97,9 @@
         </script>
     @endif
 
-    @if (setting('google_recaptcha_enabled'))
-        @push('javascript')
-            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        @endpush
-    @endif
+    @push('javascript')
+        <x-core::captcha.assets :turnstile="false" />
+    @endpush
 
     <script defer src="{{ asset('assets/js/alpine-ui.js') }}"></script>
 

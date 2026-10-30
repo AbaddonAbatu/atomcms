@@ -41,12 +41,7 @@
                     <x-theme-dusk::form.input id="recovery_code" name="recovery_code" type="text" placeholder="{{ __('Recovery Code') }}" class="mb-3" />
                 </div>
 
-                @if (setting('google_recaptcha_enabled'))
-                    <div class="g-recaptcha" data-sitekey="{{ config('habbo.site.recaptcha_site_key') }}"></div>
-                @endif
-                @if (setting('cloudflare_turnstile_enabled'))
-                    <x-turnstile />
-                @endif
+                <x-core::captcha.widgets />
 
                 <x-theme-dusk::form.secondary-button type="submit" class="mt-4">
                     {{ __('Verify') }}

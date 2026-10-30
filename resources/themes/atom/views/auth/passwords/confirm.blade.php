@@ -34,13 +34,11 @@
                     </div>
                 </div>
 
-                @if (setting('google_recaptcha_enabled'))
-                    <div class="mt-4 g-recaptcha" data-sitekey="{{ config('habbo.site.recaptcha_site_key') }}"></div>
-                @endif
+                <div class="mt-4">
+                    <x-core::captcha.widgets :turnstile="false" />
+                </div>
 
-                @if (setting('cloudflare_turnstile_enabled'))
-                    <x-turnstile />
-                @endif
+                <x-core::captcha.widgets :recaptcha="false" />
 
                 <div class="mt-4">
                     <x-theme-atom::form.primary-button>

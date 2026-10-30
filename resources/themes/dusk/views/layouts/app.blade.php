@@ -15,7 +15,7 @@
         @livewireStyles
         @livewireScriptConfig
         {{ theme_vite() }}
-        <x-turnstile.scripts />
+        <x-core::captcha.assets :recaptcha="false" />
 
         <script src="{{ asset('/assets/js/dusk.js') }}"></script>
     </head>
@@ -92,9 +92,7 @@
 
         <x-core::fancybox-assets />
 
-        @if (setting('google_recaptcha_enabled'))
-            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        @endif
+        <x-core::captcha.assets :turnstile="false" />
 
         @stack('javascript')
 
