@@ -1,7 +1,7 @@
 <x-app-layout>
     @push('title', __('Shop'))
 
-    <div class="col-span-12">
+    <div class="col-span-12" x-init="$nextTick(() => $dispatch('shop:loaded'))">
         <x-theme-atom::modals.modal-wrapper>
             <div class="w-full py-2 px-4 text-center bg-[#f68b08] text-white rounded">
                 {{ __('Please make sure to read our shop') }}
@@ -139,9 +139,4 @@
         </x-theme-atom::content.content-card>
     </div>
 
-    @push('javascript')
-        <script type="module">
-            tippy('.user-badge');
-        </script>
-    @endpush
 </x-app-layout>

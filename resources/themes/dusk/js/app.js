@@ -1,13 +1,12 @@
-import "./bootstrap";
-
 import.meta.glob(["../images/**"], {
     eager: true,
     query: "?url&no-inline",
     import: "default",
 });
-import { initFlowbite, initPopovers } from "flowbite";
 
-import { Livewire, Alpine } from "livewire";
+import { Alpine } from "livewire";
+import startPublicTheme from "../../../js/public-theme.js";
+import packagePurchase from "../../../js/components/PackagePurchase.js";
 
 import Swiper from "swiper";
 import { Navigation, Pagination } from "swiper/modules";
@@ -17,34 +16,8 @@ import "swiper/css/pagination";
 
 import "../../../js/components/HomeManager.js";
 
-window.Alpine = Alpine;
-
-const livewireStartedKey = Symbol.for("atomcms.livewire.started");
-const startLivewire = () => {
-    if (window[livewireStartedKey]) {
-        return;
-    }
-
-    window[livewireStartedKey] = true;
-
-    try {
-        Livewire.start();
-    } catch (error) {
-        delete window[livewireStartedKey];
-        throw error;
-    }
-};
-
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startLivewire, {
-        once: true,
-    });
-} else {
-    startLivewire();
-}
-
-document.addEventListener("turbolinks:load", () => initFlowbite());
-document.addEventListener("reactions:loaded", () => initPopovers());
+Alpine.data("packagePurchase", packagePurchase);
+startPublicTheme();
 
 // Swiper Initialization
 document.addEventListener("DOMContentLoaded", function () {
@@ -60,9 +33,3 @@ document.addEventListener("DOMContentLoaded", function () {
         },
     });
 });
-
-console.log(
-    "%cAtom CMS%c\n\nAtom CMS is a CMS for made for the community to enjoy. You can join our wonderful community at https://discord.gg/rX3aShUHdg\n\n",
-    "color: #14619c; -webkit-text-stroke: 2px black; font-size: 32px; font-weight: bold;",
-    ""
-);
