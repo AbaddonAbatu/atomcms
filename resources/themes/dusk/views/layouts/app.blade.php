@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <x-seo-meta />
+        <x-core::seo-meta />
 
         <link rel="icon" type="image/gif" sizes="18x17" href="{{ asset('assets/images/home_icon.gif') }}">
 
@@ -14,26 +14,26 @@
 
         @livewireStyles
         @livewireScriptConfig
-        @vite(['resources/themes/' .  setting('theme', 'dusk') . '/css/app.css', 'resources/themes/' .  setting('theme') . '/js/app.js'], 'build')
+        @vite(['resources/themes/dusk/css/app.css', 'resources/themes/dusk/js/app.js'], 'build')
         <x-turnstile.scripts />
 
         <script src="{{ asset('/assets/js/dusk.js') }}"></script>
     </head>
     <body class="font-sans antialiased select-none">
         <div id="app" class="min-h-screen bg-[#262a35] relative">
-            <x-messages.flash-messages />
+            <x-theme-dusk::messages.flash-messages />
 
-            <x-navigation.navigation-menu />
+            <x-theme-dusk::navigation.navigation-menu />
 
             {{-- Sub header --}}
             <div class="sub-header px-5 xl:px-0">
                 <div class="max-w-7xl w-full h-[40px] flex items-center justify-between">
                     <div class="flex gap-4 items-center z-20 relative">
                         <div>
-                            <x-navigation.language-selector>
+                            <x-theme-dusk::navigation.language-selector :languages="$languages">
                                 <img src="/assets/images/icons/flags/{{ session()->has('locale') ? session()->get('locale') : config('habbo.site.default_language') }}.png"
                                      alt="">
-                            </x-navigation.language-selector>
+                            </x-theme-dusk::navigation.language-selector>
                         </div>
 
                         <a href="{{ setting('discord_invitation_link') }}" target="_blank" class="transition duration-300 ease-in-out hover:text-gray-300">
@@ -88,9 +88,9 @@
             </main>
         </div>
 
-        <x-footer />
+        <x-theme-dusk::footer />
 
-        <x-fancybox-assets />
+        <x-core::fancybox-assets />
 
         @if (setting('google_recaptcha_enabled'))
             <script src="https://www.google.com/recaptcha/api.js" async defer></script>

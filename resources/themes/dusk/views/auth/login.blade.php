@@ -16,7 +16,7 @@
 
             <input type="password" placeholder="{{ __('Enter your password') }}" name="password" class="relative py-2 rounded-md mt-3 text-black w-full">
 
-            <x-site-captchas />
+            <x-theme-dusk::site-captchas />
 
             <div class="mt-4 flex gap-4">
                 <button type="submit" class="py-2 px-4 text-white bg-yellow-500 border-2 border-yellow-300 w-full rounded-md transition duration-300 ease-in-out hover:scale-[102%]">{{ __('Login') }}</button>
@@ -43,7 +43,7 @@
             <!-- Additional required wrapper -->
             <div class="swiper-wrapper" style="z-index: 14;">
                 @foreach($articles as $article)
-                    <x-article-card :article="$article" />
+                    <x-theme-dusk::article-card :article="$article" />
                 @endforeach
             </div>
         </div>
@@ -94,7 +94,7 @@
 
 
                 if (!data.data.look) {
-                    avatar.src = "/assets/images/dusk/ghost.png";
+                    avatar.src = @js(asset('/assets/images/dusk/ghost.png'));
 
                     return;
                 }

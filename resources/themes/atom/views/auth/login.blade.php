@@ -2,11 +2,11 @@
     @push('title', __('Create account'))
 
     <!-- Validation Errors -->
-    <x-messages.flash-messages />
+    <x-theme-atom::messages.flash-messages />
 
     <div class="col-span-12">
         <div class="lg:px-[250px]">
-            <x-content.content-card icon="hotel-icon" classes="flex flex-col">
+            <x-theme-atom::content.content-card icon="hotel-icon" classes="flex flex-col">
                 <x-slot:title>
                     {{ __('Login to :hotel', ['hotel' => setting('hotel_name')]) }}
                 </x-slot:title>
@@ -20,21 +20,21 @@
 
                     <div>
                         <div class="flex flex-col gap-y-2">
-                            <x-form.label for="username">
+                            <x-theme-atom::form.label for="username">
                                 {{ __('Username') }}
-                            </x-form.label>
+                            </x-theme-atom::form.label>
                         </div>
 
-                        <x-form.input error-bag="register" name="username" type="text" value="{{ old('username') }}"
+                        <x-theme-atom::form.input error-bag="register" name="username" type="text" value="{{ old('username') }}"
                             placeholder="{{ __('Username') }}" :autofocus="true" />
                     </div>
 
                     <div class="mt-4">
-                        <x-form.label for="password">
+                        <x-theme-atom::form.label for="password">
                             {{ __('Password') }}
-                        </x-form.label>
+                        </x-theme-atom::form.label>
 
-                        <x-form.input error-bag="register" name="password" type="password"
+                        <x-theme-atom::form.input error-bag="register" name="password" type="password"
                             placeholder="{{ __('Password') }}" />
                     </div>
 
@@ -48,12 +48,12 @@
                     @endif
 
                     <div class="mt-4">
-                        <x-form.primary-button>
+                        <x-theme-atom::form.primary-button>
                             {{ __('Login') }}
-                        </x-form.primary-button>
+                        </x-theme-atom::form.primary-button>
                     </div>
                 </form>
-            </x-content.content-card>
+            </x-theme-atom::content.content-card>
         </div>
     </div>
 </x-app-layout>

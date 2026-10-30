@@ -2,16 +2,19 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\UsesPublicTheme;
 use App\Models\Articles\WebsiteArticle;
 use App\Models\Articles\WebsiteArticleComment;
 use App\Models\User;
 use App\Services\Articles\CommentService;
-use Illuminate\View\View;
+use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class ArticleComments extends Component
 {
+    use UsesPublicTheme;
+
     #[Locked]
     public WebsiteArticle $article;
 
@@ -54,7 +57,7 @@ class ArticleComments extends Component
 
     public function render(): View
     {
-        return view('livewire.article-comments', [
+        return theme_view($this->themeView(), [
             'article' => $this->article->setRelation('comments', app(CommentService::class)->forArticle($this->article, false)),
         ]);
     }

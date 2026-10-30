@@ -2,16 +2,16 @@
     @push('title', __('Rules'))
 
     <div class="col-span-12 space-y-6">
-        <x-page-header>
+        <x-theme-dusk::page-header>
             <x-slot:icon>
                 <img src="{{ asset('/assets/images/dusk/exclamation-mark_icon.png') }}" alt="">
             </x-slot:icon>
 
             {{ __('Rules') }}
-        </x-page-header>
+        </x-theme-dusk::page-header>
 
         @foreach ($categories as $category)
-            <x-content.content-card icon="{{ $category->badge }}">
+            <x-theme-dusk::content.content-card icon="{{ $category->badge }}">
                 <x-slot:title>
                     {{ $category->name }}
                 </x-slot:title>
@@ -25,7 +25,7 @@
                         <li><strong>{{ $rule->paragraph }}.</strong> {{ $rule->rule }}</li>
                     @endforeach
                 </ul>
-            </x-content.content-card>
+            </x-theme-dusk::content.content-card>
         @endforeach
     </div>
 </x-app-layout>

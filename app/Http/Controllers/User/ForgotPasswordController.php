@@ -9,17 +9,17 @@ use App\Mail\ResetPasswordMail;
 use App\Models\PasswordResetToken;
 use App\Models\User;
 use App\Support\FrontendUrls;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 class ForgotPasswordController extends Controller
 {
     public function __invoke(): View
     {
-        return view('auth.passwords.forget');
+        return theme_view('auth.passwords.forget');
     }
 
     public function submitForgetPassword(ForgotPasswordRequest $request): RedirectResponse|JsonResponse
@@ -50,7 +50,7 @@ class ForgotPasswordController extends Controller
             return $this->expired();
         }
 
-        return view('auth.passwords.reset', ['token' => $token]);
+        return theme_view('auth.passwords.reset', ['token' => $token]);
     }
 
     public function submitResetPassword(ResetPasswordRequest $request, string $token): RedirectResponse|JsonResponse

@@ -12,6 +12,6 @@ class InstallationLayout extends Component
      */
     public function render(): View
     {
-        return view('layouts.installation');
+        return view('core::layouts.installation');
     }
 }

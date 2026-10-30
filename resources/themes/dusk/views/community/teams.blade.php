@@ -4,7 +4,7 @@
     <div class="col-span-12 lg:col-span-9 lg:w-[96%]">
         <div class="flex flex-col gap-y-4">
             @forelse ($employees as $employee)
-                <x-content.staff-content-section :badge="$employee->badge" :color="$employee->staff_color">
+                <x-theme-dusk::content.staff-content-section :badge="$employee->badge" :color="$employee->staff_color">
                     <x-slot:title>
                         {{ $employee->rank_name }}
                     </x-slot:title>
@@ -15,7 +15,7 @@
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($employee->users as $staff)
-                            <x-community.staff-card :user="$staff" />
+                            <x-theme-dusk::community.staff-card :user="$staff" />
                         @endforeach
                     </div>
 
@@ -24,9 +24,9 @@
                             {{ __('We currently have no members in this team') }}
                         </div>
                     @endif
-                </x-content.staff-content-section>
+                </x-theme-dusk::content.staff-content-section>
             @empty
-                <x-content.content-card icon="chat-icon" classes="border border-gray-900">
+                <x-theme-dusk::content.content-card icon="chat-icon" classes="border border-gray-900">
                     <x-slot:title>
                         {{ __('No teams found') }}
                     </x-slot:title>
@@ -38,13 +38,13 @@
                     <div class="px-2 text-sm space-y-4 text-gray-200">
                         <p>{{ __('There are no teams to display right now.') }}</p>
                     </div>
-                </x-content.content-card>
+                </x-theme-dusk::content.content-card>
             @endforelse
         </div>
     </div>
 
     <div class="col-span-12 lg:col-span-3 lg:w-[110%] space-y-4 lg:-ml-[32px]">
-        <x-content.content-card icon="chat-icon" classes="border border-gray-900">
+        <x-theme-dusk::content.content-card icon="chat-icon" classes="border border-gray-900">
             <x-slot:title>
                 {{ __(':hotel teams', ['hotel' => setting('hotel_name')]) }}
             </x-slot:title>
@@ -62,9 +62,9 @@
                     {{ __('Each team has its own role in the community. Meet the members above and discover how they contribute to :hotel!', ['hotel' => setting('hotel_name')]) }}
                 </p>
             </div>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
 
-        <x-content.content-card icon="chat-icon" classes="border border-gray-900">
+        <x-theme-dusk::content.content-card icon="chat-icon" classes="border border-gray-900">
             <x-slot:title>
                 {{ __('Apply for teams') }}
             </x-slot:title>
@@ -85,6 +85,6 @@
                     ) !!}
                 </p>
             </div>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
 </x-app-layout>

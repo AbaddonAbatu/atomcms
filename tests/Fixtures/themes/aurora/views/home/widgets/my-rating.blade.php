@@ -1,0 +1,1 @@
+<div class="aurora-card"><h2>Home rating</h2><p>Average: {{ $user->homeRatingStats->rating_avg ?? '0.0' }}</p><p>{{ $user->homeRatingStats->total ?? 0 }} votes, {{ $user->homeRatingStats->most_positive ?? 0 }} positive.</p></div>

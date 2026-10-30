@@ -8,9 +8,9 @@ use App\Http\Requests\StaffApplicationFormRequest;
 use App\Models\Community\Staff\WebsiteOpenPosition;
 use App\Services\Community\CommunityReadService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class WebsiteTeamApplicationsController extends Controller
 {
@@ -27,7 +27,7 @@ class WebsiteTeamApplicationsController extends Controller
             $userAppStatuses = app(CommunityReadService::class)->teamApplicationStatuses($user, $teamIds);
         }
 
-        return view('community.team-applications', [
+        return theme_view('community.team-applications', [
             'positions' => $positions,
             'userAppStatuses' => $userAppStatuses,
         ]);
@@ -39,7 +39,7 @@ class WebsiteTeamApplicationsController extends Controller
 
         app(CommunityReadService::class)->position($position);
 
-        return view('community.team-apply', [
+        return theme_view('community.team-apply', [
             'position' => $position,
         ]);
     }

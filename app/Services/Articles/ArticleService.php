@@ -4,6 +4,7 @@ namespace App\Services\Articles;
 
 use App\Emulator\Contracts\RankRepository;
 use App\Models\Articles\WebsiteArticle;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -37,6 +38,15 @@ class ArticleService
             $query->select('id', 'username', 'look', 'motto', $this->ranks->userKey(), 'hidden_staff', 'online')
                 ->with(['permission' => fn ($query) => $this->ranks->forDisplay($query)]);
         }]);
+    }
+
+    /**
+     * The user the author's avatar links to: the loaded author, or the first
+     * user when the article has none. The fallback query only runs then.
+     */
+    public function authorHome(WebsiteArticle $article): ?User
+    {
+        return $article->user ?? User::query()->first();
     }
 
     /**

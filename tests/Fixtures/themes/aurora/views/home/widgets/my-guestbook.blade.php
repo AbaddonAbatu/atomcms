@@ -1,0 +1,1 @@
+<div class="aurora-card"><h2>Guestbook</h2>@forelse ($user->receivedHomeMessages as $message)<p>{{ $message->user->username }}: {{ $message->renderedContent }}</p>@empty<p class="aurora-muted">No guestbook messages.</p>@endforelse</div>

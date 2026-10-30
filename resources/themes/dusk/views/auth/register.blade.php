@@ -45,7 +45,7 @@
             {{-- Used to determine the refer --}}
             <input type="hidden" name="referral_code" value="{{ $referral_code }}">
 
-           <x-site-captchas />
+           <x-theme-dusk::site-captchas />
 
             <div class="mt-4 grid grid-cols-2 gap-3">
                 <button type="submit" class="py-2 px-4 text-white bg-yellow-500 border-2 border-yellow-300 w-full rounded-md transition duration-300 ease-in-out hover:scale-[102%]">{{ __('Register') }}</button>
@@ -142,7 +142,7 @@
 
 
                 if (!data.data.look) {
-                    avatar.src = "/assets/images/dusk/ghost.png";
+                    avatar.src = @js(asset('/assets/images/dusk/ghost.png'));
 
                     return;
                 }

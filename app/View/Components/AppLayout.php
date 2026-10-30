@@ -2,8 +2,9 @@
 
 namespace App\View\Components;
 
+use App\Models\Miscellaneous\WebsiteLanguage;
+use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
-use Illuminate\View\View;
 
 class AppLayout extends Component
 {
@@ -12,6 +13,8 @@ class AppLayout extends Component
      */
     public function render(): View
     {
-        return view('layouts.app');
+        return theme_view('layouts.app', [
+            'languages' => WebsiteLanguage::query()->get(),
+        ]);
     }
 }

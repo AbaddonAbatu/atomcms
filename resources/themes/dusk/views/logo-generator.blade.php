@@ -2,7 +2,7 @@
     @push('title', __('Generator'))
 
     <div class="col-span-12">
-        <x-content.content-card icon="hotel-icon" classes="border border-gray-900">
+        <x-theme-dusk::content.content-card icon="hotel-icon" classes="border border-gray-900">
             <x-slot:title>
                 {{ __('Logo generator') }}
             </x-slot:title>
@@ -69,7 +69,7 @@
                    </div>
                 </div>
             </div>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
 
     <script

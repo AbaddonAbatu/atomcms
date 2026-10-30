@@ -26,7 +26,6 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Livewire\Blaze\Blaze;
 use Livewire\Livewire;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
@@ -54,7 +53,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(InstallationService::class);
 
-        $this->app->singleton(SettingsService::class);
+        // Scoped so each request or queued job starts with a fresh in-memory
+        // memo; the persistent 'website_settings' cache is still shared.
+        $this->app->scoped(SettingsService::class);
 
         $this->app->singleton(PermissionsService::class);
 
@@ -96,10 +97,6 @@ class AppServiceProvider extends ServiceProvider
             ->symbols());
 
         Model::preventLazyLoading(! $this->app->isProduction());
-
-        Blaze::optimize()
-            ->in(resource_path('themes/atom/views/components'))
-            ->in(resource_path('themes/dusk/views/components'));
 
         if (config('habbo.site.force_https')) {
             URL::forceScheme('https');

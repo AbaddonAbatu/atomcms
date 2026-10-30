@@ -13,7 +13,7 @@
         </div>
 
         <div class="z-10">
-            <div class="hidden lg:block h-[200px] w-[200px] rounded-full relative overflow-hidden" style="background: url('/assets/images/dusk/me_circle_image.png')">
+            <div class="hidden lg:block h-[200px] w-[200px] rounded-full relative overflow-hidden" style="background: url('{{ asset('/assets/images/dusk/me_circle_image.png') }}')">
                 <div>
                     <a href="{{ route('home.show', $user) }}"
                        class="absolute -bottom-12 left-2 lg:left-8 drop-shadow transition duration-300 ease-in-out hover:scale-105">
@@ -45,29 +45,29 @@
 
         <div class="absolute w-full bottom-0 left-0 h-20 bg-gray-900 py-4 lg:pl-64 px-4 lg:px-0">
             <div class="flex gap-x-6 h-full items-center justify-center lg:justify-start">
-                <x-currency icon="nav-credit-icon">
+                <x-theme-dusk::currency icon="nav-credit-icon">
                     <x-slot:currency>
                         {{ auth()->user()->credits }}
                     </x-slot:currency>
 
                     <span class="hidden lg:block">{{ __('Credits') }}</span>
-                </x-currency>
+                </x-theme-dusk::currency>
 
-                <x-currency icon="nav-ducket-icon">
+                <x-theme-dusk::currency icon="nav-ducket-icon">
                     <x-slot:currency>
                         {{ auth()->user()->currency('duckets') }}
                     </x-slot:currency>
 
                     <span class="hidden lg:block"> {{ __('Duckets') }}</span>
-                </x-currency>
+                </x-theme-dusk::currency>
 
-                <x-currency icon="nav-diamond-icon">
+                <x-theme-dusk::currency icon="nav-diamond-icon">
                     <x-slot:currency>
                         {{ auth()->user()->currency('diamonds') }}
                     </x-slot:currency>
 
                     <span class="hidden lg:block">{{ __('Diamonds') }}</span>
-                </x-currency>
+                </x-theme-dusk::currency>
             </div>
         </div>
     </div>
@@ -88,7 +88,7 @@
             <!-- Additional required wrapper -->
             <div class="swiper-wrapper" style="z-index: 14;">
                 @foreach($articles as $article)
-                    <x-article-card :article="$article" />
+                    <x-theme-dusk::article-card :article="$article" />
                 @endforeach
             </div>
         </div>
@@ -135,7 +135,7 @@
    </div>
 
     <div class="col-span-12 md:col-span-8">
-        <x-content.content-card icon="hotel-icon">
+        <x-theme-dusk::content.content-card icon="hotel-icon">
             <x-slot:title>
                 {{ sprintf(__('User Referrals (%s/%s)'), auth()->user()->referrals->referrals_total ?? 0, setting('referrals_needed')) }}
             </x-slot:title>
@@ -153,14 +153,14 @@
                 </small>
 
                 <div class="grid grid-cols-12 gap-2 mt-2">
-                    <x-form.input classes="col-span-12 md:col-span-10" name="referral"
+                    <x-theme-dusk::form.input classes="col-span-12 md:col-span-10" name="referral"
                                   value="{{ sprintf('%s/register/%s', config('habbo.site.site_url'), auth()->user()->referral_code) }}"
                                   :autofocus="false" :readonly="true" />
 
                     <div class="col-span-12 flex md:col-span-2" onclick="copyCode()">
-                        <x-form.secondary-button>
+                        <x-theme-dusk::form.secondary-button>
                             {{ __('Copy code') }}
-                        </x-form.secondary-button>
+                        </x-theme-dusk::form.secondary-button>
                     </div>
 
                 </div>
@@ -168,9 +168,9 @@
                 @if (auth()->user()->referrals?->referrals_total >= (int) setting('referrals_needed'))
                     <form method="POST" action="{{ route('claim.referral-reward') }}">
                         @csrf
-                        <x-form.secondary-button classes="mt-2">
+                        <x-theme-dusk::form.secondary-button classes="mt-2">
                             {{ __('Claim your referrals reward!') }}
-                        </x-form.secondary-button>
+                        </x-theme-dusk::form.secondary-button>
                     </form>
                 @else
                     <button disabled class="mt-2 w-full rounded bg-[#171a23] p-2 text-white">
@@ -178,7 +178,7 @@
                     </button>
                 @endif
             </div>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
 
     @push('javascript')

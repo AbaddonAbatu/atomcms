@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <x-seo-meta />
+    <x-core::seo-meta />
 
     <link rel="icon" type="image/gif" sizes="18x17" href="{{ asset('assets/images/home_icon.gif') }}">
 
@@ -15,7 +15,7 @@
 
     @livewireStyles
     @livewireScriptConfig
-    @vite(['resources/themes/' .  setting('theme') . '/css/app.css', 'resources/themes/' .  setting('theme') . '/js/app.js'], 'build')
+    @vite(['resources/themes/atom/css/app.css', 'resources/themes/atom/js/app.js'], 'build')
 </head>
 
 <body>

@@ -3,7 +3,7 @@
 
     <div class="col-span-12 space-y-14">
         <div class="col-span-12">
-            <x-content.guest-content-card icon="hotel-icon">
+            <x-theme-atom::content.guest-content-card icon="hotel-icon">
                 <x-slot:title>
                     {{ __('Latest news') }}
                 </x-slot:title>
@@ -14,17 +14,17 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     @forelse($articles as $article)
-                        <x-article-card :article="$article" />
+                        <x-theme-atom::article-card :article="$article" />
                     @empty
-                        <x-filler-article-card />
+                        <x-theme-atom::filler-article-card />
                     @endforelse
                 </div>
-            </x-content.guest-content-card>
+            </x-theme-atom::content.guest-content-card>
         </div>
 
         @if($photos->isNotEmpty())
             <div class="col-span-12">
-                <x-content.guest-content-card icon="camera-icon">
+                <x-theme-atom::content.guest-content-card icon="camera-icon">
                     <x-slot:title>
                         {{ __('Latest Photos') }}
                     </x-slot:title>
@@ -32,11 +32,11 @@
                     <x-slot:under-title>
                         {{ __('Have a look at some of the great moments captured by users around the hotel.') }}
                     </x-slot:under-title>
-                    <x-photos :photos="$photos" />
-                </x-content.guest-content-card>
+                    <x-theme-atom::photos :photos="$photos" />
+                </x-theme-atom::content.guest-content-card>
             </div>
         @endif
     </div>
 
-    <x-fancybox-assets />
+    <x-core::fancybox-assets />
 </x-app-layout>

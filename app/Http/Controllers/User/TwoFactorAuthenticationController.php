@@ -5,11 +5,11 @@ namespace App\Http\Controllers\User;
 use App\Data\TwoFactorSetupData;
 use App\Http\Controllers\Controller;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\View\View;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
@@ -18,7 +18,7 @@ class TwoFactorAuthenticationController extends Controller
 {
     public function index(): View
     {
-        return view('user.settings.two-factor');
+        return theme_view('user.settings.two-factor');
     }
 
     public function store(Request $request, EnableTwoFactorAuthentication $enable): RedirectResponse|JsonResponse|Response

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Community\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Services\Community\TeamService;
-use Illuminate\View\View;
+use Illuminate\Contracts\View\View;
 
 class WebsiteTeamsController extends Controller
 {
@@ -14,7 +14,7 @@ class WebsiteTeamsController extends Controller
     {
         $employees = $this->teamService->fetchTeams();
 
-        return view('community.teams', [
+        return theme_view('community.teams', [
             'employees' => $employees,
         ]);
     }

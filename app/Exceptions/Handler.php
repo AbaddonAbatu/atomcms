@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -57,6 +58,12 @@ class Handler extends ExceptionHandler
             }
         }
 
+        // Only the page a route requested is a 404. A view missing while a page
+        // renders arrives wrapped and means the theme is broken: 503 below.
+        if ($e instanceof ThemePresentationException && $e->statusCode === 404) {
+            $e = new NotFoundHttpException('Not Found');
+        }
+
         $response = parent::render($request, $e);
         if (! $request->is('api/v1', 'api/v1/*') || ! $response instanceof JsonResponse) {
             return $response;
@@ -94,6 +101,34 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        // A page the theme omits is an ordinary 404, so it is noted without a
+        // stack trace. Views missing inside a rendering page still report.
+        $this->reportable(function (ThemePresentationException $e): ?bool {
+            if ($e->statusCode !== 404) {
+                return null;
+            }
+
+            Log::info($e->getMessage());
+
+            return false;
+        });
+
+        // An unusable public theme answers with the asset-free Core diagnostic;
+        // the precise problem stays in the log and `atom:themes:validate`. The
+        // cause is searched because view errors arrive wrapped (by Blade, or by
+        // Ignition's view exception in development).
+        $this->renderable(function (Throwable $e, Request $request): ?Response {
+            for ($cause = $e; $cause !== null; $cause = $cause->getPrevious()) {
+                if ($cause instanceof ThemePresentationException) {
+                    return $request->expectsJson()
+                        ? response()->json(['message' => __('Service Unavailable')], 503)
+                        : response()->view('core::errors.theme-unavailable', status: 503);
+                }
+            }
+
+            return null;
         });
 
         // The home widget endpoint is consumed by JavaScript that expects a

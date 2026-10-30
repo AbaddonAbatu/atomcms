@@ -42,7 +42,7 @@
     @endauth
 
     @guest
-        <x-modals.modal-wrapper>
+        <x-theme-atom::modals.modal-wrapper>
             <div class="flex justify-center">
                 <div class="text-white font-semibold flex-col md:w-[600px]">
                     <p class="hidden text-center text-xl md:block">
@@ -67,10 +67,10 @@
                 </div>
             </div>
 
-            <x-modals.regular-modal x-model="show {{ session()->get('wrong-auth') }}">
-                <x-auth.login-form />
-            </x-modals.regular-modal>
-        </x-modals.modal-wrapper>
+            <x-theme-atom::modals.regular-modal x-model="show {{ session()->get('wrong-auth') }}">
+                <x-theme-atom::auth.login-form />
+            </x-theme-atom::modals.regular-modal>
+        </x-theme-atom::modals.modal-wrapper>
 
     @endguest
 </div>

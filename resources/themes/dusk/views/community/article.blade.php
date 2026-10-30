@@ -4,9 +4,9 @@
     @push('meta_image', asset('storage/' . $article->image))
 
     <div class="col-span-12 rounded space-y-3 md:col-span-3">
-        <x-community.staff-card :user="$article->user" />
+        <x-theme-dusk::community.staff-card :user="$article->user" />
 
-        <x-content.content-card icon="article-icon">
+        <x-theme-dusk::content.content-card icon="article-icon">
             <x-slot:title>
                 {{ __('Other articles') }}
             </x-slot:title>
@@ -28,7 +28,7 @@
                     </p>
                 @endforelse
             </div>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
 
     <div class="col-span-12 space-y-4 md:col-span-9">

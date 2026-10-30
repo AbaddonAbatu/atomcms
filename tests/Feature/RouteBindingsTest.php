@@ -32,7 +32,7 @@ test('a referral link resolves the user by referral code or 404s', function () {
 
     $this->get(route('register.referral', 'FRIEND-CODE'))
         ->assertOk()
-        ->assertViewIs('auth.register')
+        ->assertViewIs('theme-' . setting('theme') . '::auth.register')
         ->assertViewHas('referral_code', $referrer->referral_code);
 
     $this->get(route('register.referral', 'NOT-A-CODE'))->assertNotFound();

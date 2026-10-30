@@ -2,11 +2,11 @@
     @push('title', __('Password settings'))
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-3">
-        <x-user.settings.settings-navigation />
+        <x-theme-dusk::user.settings.settings-navigation />
     </div>
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-9">
-        <x-content.content-card icon="hotel-icon">
+        <x-theme-dusk::content.content-card icon="hotel-icon">
             <x-slot:title>
                 {{ __('Password settings') }}
             </x-slot:title>
@@ -20,49 +20,49 @@
                 @csrf
 
                 <div class="flex flex-col gap-y-1">
-                    <x-form.label for="current_password">
+                    <x-theme-dusk::form.label for="current_password">
                         {{ __('Current password') }}
 
                         <x-slot:info>
                             {{ __('Enter your current password') }}
                         </x-slot:info>
-                    </x-form.label>
+                    </x-theme-dusk::form.label>
 
-                    <x-form.input name="current_password" type="password" :autofocus="true" />
+                    <x-theme-dusk::form.input name="current_password" type="password" :autofocus="true" />
                 </div>
 
                 <div class="flex flex-col gap-y-1">
-                    <x-form.label for="password">
+                    <x-theme-dusk::form.label for="password">
                         {{ __('New password') }}
 
                         <x-slot:info>
                             {{ __('Enter a new secure password. Do not forget to save it somewhere safe') }}
                         </x-slot:info>
-                    </x-form.label>
+                    </x-theme-dusk::form.label>
 
-                    <x-form.input name="password" type="password" />
+                    <x-theme-dusk::form.input name="password" type="password" />
                 </div>
 
                 <div class="flex flex-col gap-y-1">
-                    <x-form.label for="password_confirmation">
+                    <x-theme-dusk::form.label for="password_confirmation">
                         {{ __('Confirm new password') }}
 
                         <x-slot:info>
                             {{ __('Please confirm your new password') }}
                         </x-slot:info>
-                    </x-form.label>
+                    </x-theme-dusk::form.label>
 
-                    <x-form.input name="password_confirmation" type="password" />
+                    <x-theme-dusk::form.input name="password_confirmation" type="password" />
                 </div>
 
-                <x-site-captchas />
+                <x-theme-dusk::site-captchas />
 
                 <div class="flex w-full justify-start md:justify-end">
-                    <x-form.secondary-button classes="lg:w-1/4">
+                    <x-theme-dusk::form.secondary-button classes="lg:w-1/4">
                         {{ __('Update password') }}
-                    </x-form.secondary-button>
+                    </x-theme-dusk::form.secondary-button>
                 </div>
             </form>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
 </x-app-layout>

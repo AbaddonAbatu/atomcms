@@ -7,10 +7,10 @@ use App\Models\Miscellaneous\WebsiteInstallation;
 use App\Models\Miscellaneous\WebsiteSetting;
 use App\Rules\ValidateInstallationKeyRule;
 use App\Services\InstallationSetup;
+use App\Services\SettingsService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -18,7 +18,7 @@ class InstallationController extends Controller
 {
     public function index(): View
     {
-        return view('installation.index');
+        return view('core::installation.index');
     }
 
     public function storeInstallationKey(Request $request): RedirectResponse
@@ -45,7 +45,7 @@ class InstallationController extends Controller
         }
 
         /** @var view-string $view */
-        $view = "installation.step-{$currentStep}";
+        $view = "core::installation.step-{$currentStep}";
 
         return view($view, [
             'settings' => $this->getSettingsForStep($currentStep),
@@ -80,8 +80,9 @@ class InstallationController extends Controller
         ]);
 
         WebsiteSetting::where('key', 'theme')->update([
-            'value' => 'atom',
+            'value' => config('theme.default'),
         ]);
+        app(SettingsService::class)->refresh();
 
         return to_route('installation.index');
     }
@@ -119,7 +120,8 @@ class InstallationController extends Controller
             ]);
         }
 
-        // Cache will be automatically cleared by WebsiteSetting model events
+        // Bulk updates fire no model events, so drop the cached settings here.
+        app(SettingsService::class)->refresh();
     }
 
     private function installation(): WebsiteInstallation

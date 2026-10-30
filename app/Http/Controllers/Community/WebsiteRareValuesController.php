@@ -7,8 +7,8 @@ use App\Http\Requests\RareSearchFormRequest;
 use App\Models\Community\RareValue\WebsiteRareValue;
 use App\Models\Community\RareValue\WebsiteRareValueCategory;
 use App\Services\Community\RareValues\RareValueCategoriesService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class WebsiteRareValuesController extends Controller
 {
@@ -18,7 +18,7 @@ class WebsiteRareValuesController extends Controller
 
     public function index(): View
     {
-        return view('rare-values', [
+        return theme_view('rare-values', [
             'categories' => $this->valueCategoriesService->fetchCategoriesByPriority(),
             'categoriesNav' => $this->valueCategoriesService->fetchAllCategories(),
         ]);
@@ -28,7 +28,7 @@ class WebsiteRareValuesController extends Controller
     {
         $category->load('furniture');
 
-        return view('rare-values', [
+        return theme_view('rare-values', [
             'categories' => $category,
             'categoriesNav' => $this->valueCategoriesService->fetchAllCategories(),
         ]);
@@ -46,7 +46,7 @@ class WebsiteRareValuesController extends Controller
             ]);
         }
 
-        return view('rare-values', [
+        return theme_view('rare-values', [
             'categories' => $categories,
             'categoriesNav' => WebsiteRareValueCategory::has('furniture')->get(),
         ]);
@@ -54,7 +54,7 @@ class WebsiteRareValuesController extends Controller
 
     public function value(WebsiteRareValue $value): View
     {
-        return view('value', [
+        return theme_view('value', [
             'value' => $value,
             'items' => $this->valueCategoriesService->itemsPerUser($value),
         ]);

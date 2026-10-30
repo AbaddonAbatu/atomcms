@@ -1,7 +1,7 @@
 <x-app-layout>
     @push('title', 'Create a ticket')
 
-    <x-content.content-card icon="chat-icon" classes="border border-gray-900 col-span-12 lg:col-span-9">
+    <x-theme-dusk::content.content-card icon="chat-icon" classes="border border-gray-900 col-span-12 lg:col-span-9">
         <x-slot:title>
             {{ __('Create a ticket') }}
         </x-slot:title>
@@ -23,24 +23,24 @@
             </select>
 
             <div class="mt-4 no-tailwind">
-                <x-form.label for="password_confirmation">
+                <x-theme-dusk::form.label for="password_confirmation">
                     {{ __('Title') }}
-                </x-form.label>
+                </x-theme-dusk::form.label>
 
-                <x-form.input name="title" type="text"
+                <x-theme-dusk::form.input name="title" type="text"
                               placeholder="{{ __('Enter a title for your ticket') }}"/>
             </div>
 
-            <x-form.wysiwyg-editor/>
+            <x-theme-dusk::form.wysiwyg-editor/>
 
-            <x-form.secondary-button type="submit" classes="mt-4">
+            <x-theme-dusk::form.secondary-button type="submit" classes="mt-4">
                 {{ __('Submit ticket') }}
-            </x-form.secondary-button>
+            </x-theme-dusk::form.secondary-button>
         </form>
-    </x-content.content-card>
+    </x-theme-dusk::content.content-card>
 
     <div class="col-span-12 lg:col-span-3">
-        <x-content.content-card icon="duo-chat-icon"
+        <x-theme-dusk::content.content-card icon="duo-chat-icon"
                                 classes="border border-gray-900 text-gray-100">
             <x-slot:title>
                 {{ __('Open tickets') }}
@@ -73,6 +73,6 @@
 
                 @endforelse
             </div>
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
 </x-app-layout>

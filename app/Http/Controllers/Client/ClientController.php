@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Services\Client\ClientLaunchService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class ClientController extends Controller
 {
@@ -23,7 +23,7 @@ class ClientController extends Controller
             default => 'client.nitro',
         };
 
-        return view($view, [
+        return theme_view($view, [
             'sso' => app(ClientLaunchService::class)->ticket($user, $request->ip() ?: 'unknown'),
         ]);
     }

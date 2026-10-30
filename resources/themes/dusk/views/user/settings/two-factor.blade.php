@@ -2,11 +2,11 @@
     @push('title', __('Two factor'))
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-3">
-        <x-user.settings.settings-navigation />
+        <x-theme-dusk::user.settings.settings-navigation />
     </div>
 
     <div class="col-span-12 flex flex-col gap-y-3 md:col-span-9">
-        <x-content.content-card icon="hotel-icon">
+        <x-theme-dusk::content.content-card icon="hotel-icon">
             <x-slot:title>
                 {{ __('Two factor authentication') }}
             </x-slot:title>
@@ -21,14 +21,14 @@
                     @csrf
                     @method('delete')
 
-                    <x-form.label for="current_password">
+                    <x-theme-dusk::form.label for="current_password">
                         {{ __('Current password') }}
-                    </x-form.label>
-                    <x-form.input classes="mb-3" name="current_password" type="password" required />
+                    </x-theme-dusk::form.label>
+                    <x-theme-dusk::form.input classes="mb-3" name="current_password" type="password" required />
 
-                    <x-form.danger-button>
+                    <x-theme-dusk::form.danger-button>
                         {{ __('Disable 2FA') }}
-                    </x-form.danger-button>
+                    </x-theme-dusk::form.danger-button>
                 </form>
 
                 {{-- 2FA enabled but not yet confirmed, we show the QRcode and ask for confirmation --}}
@@ -65,15 +65,15 @@
                 <form action="{{ route('two-factor.verify') }}" method="POST" class="mt-8">
                     @csrf
 
-                    <x-form.label for="code">
+                    <x-theme-dusk::form.label for="code">
                         {{ __('Code') }}
 
                         <x-slot:info>
                             {{ __('Please scan the QR-code above with your phone to retrieve your two-factor authentication code.') }}
                         </x-slot:info>
-                    </x-form.label>
+                    </x-theme-dusk::form.label>
 
-                    <x-form.input errorBag="confirmTwoFactorAuthentication" classes="mb-3" name="code" placeholder="{{ __('Code') }}" />
+                    <x-theme-dusk::form.input errorBag="confirmTwoFactorAuthentication" classes="mb-3" name="code" placeholder="{{ __('Code') }}" />
 
                     @if (setting('google_recaptcha_enabled'))
                         <div class="g-recaptcha" data-sitekey="{{ config('habbo.site.recaptcha_site_key') }}"></div>
@@ -83,9 +83,9 @@
                         <x-turnstile />
                     @endif
 
-                    <x-form.secondary-button classes="mt-4">
+                    <x-theme-dusk::form.secondary-button classes="mt-4">
                         {{ __('Verify 2FA') }}
-                    </x-form.secondary-button>
+                    </x-theme-dusk::form.secondary-button>
                 </form>
             @else
                 <div class="flex flex-col items-end">
@@ -102,17 +102,17 @@
                     <form action="{{ route('user.two-factor.enable') }}" method="post" class="mt-8">
                         @csrf
 
-                        <x-form.label for="current_password">
+                        <x-theme-dusk::form.label for="current_password">
                             {{ __('Current password') }}
-                        </x-form.label>
-                        <x-form.input classes="mb-3" name="current_password" type="password" required />
+                        </x-theme-dusk::form.label>
+                        <x-theme-dusk::form.input classes="mb-3" name="current_password" type="password" required />
 
-                        <x-form.secondary-button>
+                        <x-theme-dusk::form.secondary-button>
                             {{ __('Activate 2FA') }}
-                        </x-form.secondary-button>
+                        </x-theme-dusk::form.secondary-button>
                     </form>
                 </div>
             @endif
-        </x-content.content-card>
+        </x-theme-dusk::content.content-card>
     </div>
 </x-app-layout>

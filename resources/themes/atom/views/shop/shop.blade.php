@@ -2,14 +2,14 @@
     @push('title', __('Shop'))
 
     <div class="col-span-12">
-        <x-modals.modal-wrapper>
+        <x-theme-atom::modals.modal-wrapper>
             <div class="w-full py-2 px-4 text-center bg-[#f68b08] text-white rounded">
                 {{ __('Please make sure to read our shop') }}
                 <button class="text-white underline font-bold" x-on:click="open = true">{{ __('Terms & Conditions') }}</button>
                 {{ __('before making a purchase') }}
             </div>
 
-            <x-modals.regular-modal>
+            <x-theme-atom::modals.regular-modal>
                 <x-slot name="title">
                     <h2 class="text-2xl">
                         {{ __('Shop Terms & Conditions') }}
@@ -40,12 +40,12 @@
                         <p>{{ __('Remember, your financial well-being is crucial, and making responsible choices is key. If you are facing difficulties in controlling your spending habits, do not hesitate to seek friendly and professional guidance. There are resources available that can provide valuable advice and support.') }}</p>
                     </div>
                 </div>
-            </x-modals.regular-modal>
-        </x-modals.modal-wrapper>
+            </x-theme-atom::modals.regular-modal>
+        </x-theme-atom::modals.modal-wrapper>
     </div>
 
     <div class="col-span-12 md:col-span-3">
-        <x-content.content-card icon="catalog-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="catalog-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ __('Categories') }}
             </x-slot:title>
@@ -67,19 +67,19 @@
                     </a>
                 @endforeach
             </div>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 
     <div class="col-span-12 md:col-span-6">
         <div class="flex flex-col gap-y-2 dark:text-gray-300">
             @foreach ($shopPackages as $shopPackage)
-                <x-shop.package-card :package="$shopPackage" />
+                <x-theme-atom::shop.package-card :package="$shopPackage" />
             @endforeach
         </div>
     </div>
 
     <div class="row-start-2 md:row-auto col-span-12 flex flex-col gap-y-3 md:col-span-5 lg:col-span-4 xl:col-span-3">
-        <x-content.content-card icon="currency-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="currency-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ __('Top up account') }}
             </x-slot:title>
@@ -96,7 +96,7 @@
                 <form action="{{ route('paypal.process-transaction') }}" method="POST" class="mt-3">
                     @csrf
 
-                    <x-form.input name="amount" type="number" value="0" placeholder="amount" />
+                    <x-theme-atom::form.input name="amount" type="number" value="0" placeholder="amount" />
 
                     <button type="submit" class="mt-2 w-full rounded bg-blue-600 hover:bg-blue-700 text-white p-2 border-2 border-blue-500 transition ease-in-out duration-150 font-semibold">
                         {{ __('Donate') }}
@@ -107,10 +107,10 @@
                     {{ __('Please setup the paypal credentials to allow for top ups') }}
                 </p>
             @endif
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
 
 
-        <x-content.content-card icon="catalog-icon" classes="border dark:border-gray-900">
+        <x-theme-atom::content.content-card icon="catalog-icon" classes="border dark:border-gray-900">
             <x-slot:title>
                 {{ __('Voucher') }}
             </x-slot:title>
@@ -122,7 +122,7 @@
             <form action="{{ route('shop.use-voucher') }}" method="POST">
                 @csrf
 
-                <x-form.input classes="mb-3" name="code" type="text" placeholder="Voucher" />
+                <x-theme-atom::form.input classes="mb-3" name="code" type="text" placeholder="Voucher" />
 
                 @if (setting('google_recaptcha_enabled'))
                     <div class="g-recaptcha" data-sitekey="{{ config('habbo.site.recaptcha_site_key') }}"></div>
@@ -132,11 +132,11 @@
                     <x-turnstile />
                 @endif
 
-                <x-form.secondary-button classes="mt-2">
+                <x-theme-atom::form.secondary-button classes="mt-2">
                     {{ __('Use voucher') }}
-                </x-form.secondary-button>
+                </x-theme-atom::form.secondary-button>
             </form>
-        </x-content.content-card>
+        </x-theme-atom::content.content-card>
     </div>
 
     @push('javascript')

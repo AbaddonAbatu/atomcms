@@ -1,10 +1,10 @@
 {
     "agents": [
+        "claude_code",
         "codex"
     ],
     "cloud": false,
     "guidelines": true,
-    "mcp": false,
     "packages": [
         "filament/filament"
     ],

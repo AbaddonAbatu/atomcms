@@ -2,7 +2,7 @@
     @push('title', __('Shop'))
 
     <div class="col-span-12 ">
-        <x-modals.modal-wrapper>
+        <x-theme-dusk::modals.modal-wrapper>
             <div class="w-full py-2 px-4 text-center bg-[#f68b08] text-white rounded">
                 {{ __('Please make sure to read our shop') }}
                 <button class="text-white underline font-bold"
@@ -10,7 +10,7 @@
                 {{ __('before making a purchase') }}
             </div>
 
-            <x-modals.regular-modal>
+            <x-theme-dusk::modals.regular-modal>
                 <x-slot name="title">
                     <h2 class="text-2xl">
                         {{ __('Shop Terms & Conditions') }}
@@ -41,16 +41,16 @@
                         <p>{{ __('Remember, your financial well-being is crucial, and making responsible choices is key. If you are facing difficulties in controlling your spending habits, do not hesitate to seek friendly and professional guidance. There are resources available that can provide valuable advice and support.') }}</p>
                     </div>
                 </div>
-            </x-modals.regular-modal>
-        </x-modals.modal-wrapper>
+            </x-theme-dusk::modals.regular-modal>
+        </x-theme-dusk::modals.modal-wrapper>
     </div>
 
     <div class="col-span-12 grid grid-cols-12 gap-4">
         <div class="order-last lg:order-1 col-span-12 md:col-span-9 grid grid-cols-12 gap-4">
             <div class="col-span-12 md:col-span-3">
-                <x-page-header>
+                <x-theme-dusk::page-header>
                     {{ __('Categories') }}
-                </x-page-header>
+                </x-theme-dusk::page-header>
 
                 <div class="mt-3 space-y-2">
                     <a href="{{ route('shop.index') }}"
@@ -75,7 +75,7 @@
                 @if($shopPackages->isNotEmpty())
                     <div class="grid grid-cols-1 lg:grid-cols-{{ $shopPackages->count() > 1 ? '2' : '1' }} gap-4">
                         @foreach ($shopPackages as $shopPackage)
-                            <x-shop.package-card :package="$shopPackage"/>
+                            <x-theme-dusk::shop.package-card :package="$shopPackage"/>
                         @endforeach
                     </div>
                 @endif
@@ -83,7 +83,7 @@
         </div>
 
         <div class="col-span-12 md:col-span-3 space-y-4 lg:order-last">
-            <x-content.content-card icon="currency-icon">
+            <x-theme-dusk::content.content-card icon="currency-icon">
                 <x-slot:title>
                     {{ __('Top up account') }}
                 </x-slot:title>
@@ -100,7 +100,7 @@
                     <form action="{{ route('paypal.process-transaction') }}" method="POST" class="mt-3">
                         @csrf
 
-                        <x-form.input name="amount" type="number" value="0" placeholder="amount"/>
+                        <x-theme-dusk::form.input name="amount" type="number" value="0" placeholder="amount"/>
 
                         <button type="submit"
                                 class="mt-2 w-full rounded bg-blue-600 hover:bg-blue-700 text-white p-2 border-2 border-blue-500 transition ease-in-out duration-150 font-semibold">
@@ -112,9 +112,9 @@
                         {{ __('Please setup the paypal credentials to allow for top ups') }}
                     </p>
                 @endif
-            </x-content.content-card>
+            </x-theme-dusk::content.content-card>
 
-            <x-content.content-card icon="catalog-icon">
+            <x-theme-dusk::content.content-card icon="catalog-icon">
                 <x-slot:title>
                     {{ __('Voucher') }}
                 </x-slot:title>
@@ -126,15 +126,15 @@
                 <form action="{{ route('shop.use-voucher') }}" method="POST">
                     @csrf
 
-                    <x-form.input name="code" type="text" placeholder="Voucher"/>
+                    <x-theme-dusk::form.input name="code" type="text" placeholder="Voucher"/>
 
-                    <x-site-captchas/>
+                    <x-theme-dusk::site-captchas/>
 
-                    <x-form.secondary-button classes="mt-2">
+                    <x-theme-dusk::form.secondary-button classes="mt-2">
                         {{ __('Use voucher') }}
-                    </x-form.secondary-button>
+                    </x-theme-dusk::form.secondary-button>
                 </form>
-            </x-content.content-card>
+            </x-theme-dusk::content.content-card>
         </div>
     </div>
 

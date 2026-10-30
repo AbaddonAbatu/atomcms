@@ -8,8 +8,8 @@ use App\Http\Requests\StaffApplicationFormRequest;
 use App\Models\Community\Staff\WebsiteOpenPosition;
 use App\Services\Community\CommunityReadService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class StaffApplicationsController extends Controller
 {
@@ -17,7 +17,7 @@ class StaffApplicationsController extends Controller
     {
         $positions = app(CommunityReadService::class)->positions('rank');
 
-        return view('community.staff-applications', compact('positions'));
+        return theme_view('community.staff-applications', compact('positions'));
     }
 
     public function show(WebsiteOpenPosition $position): View
@@ -25,7 +25,7 @@ class StaffApplicationsController extends Controller
         abort_unless($position->position_kind === 'rank', 404);
         app(CommunityReadService::class)->position($position);
 
-        return view('community.staff-apply', compact('position'));
+        return theme_view('community.staff-apply', compact('position'));
     }
 
     public function store(

@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Badge\BadgePurchaseRequest;
 use App\Services\SettingsService;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
 
 class BadgeController extends Controller
 {
@@ -16,7 +16,7 @@ class BadgeController extends Controller
     {
         $error = $this->badgeFolderError($settingsService->getOrDefault('badge_path_filesystem'));
 
-        return view('draw-badge', [
+        return theme_view('draw-badge', [
             'cost' => (int) $settingsService->getOrDefault('drawbadge_currency_value', 150),
             'currencyType' => $settingsService->getOrDefault('drawbadge_currency_type', 'credits'),
             'folderError' => $error !== null,

@@ -24,7 +24,7 @@ class ResetPasswordMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'email.forgetPassword',
+            view: 'core::mail.password-reset',
             with: [
                 'resetUrl' => app(FrontendUrls::class)->route('reset.password.get', ['token' => $this->token]),
             ],

@@ -6,7 +6,7 @@ use App\Emulator\Contracts\RankRepository;
 use App\Http\Controllers\Controller;
 use App\Services\Articles\ArticleService;
 use App\Support\AuthenticatedUser;
-use Illuminate\View\View;
+use Illuminate\Contracts\View\View;
 
 class MeController extends Controller
 {
@@ -14,7 +14,7 @@ class MeController extends Controller
     {
         $user = AuthenticatedUser::current();
 
-        return view('user.me', [
+        return theme_view('user.me', [
             'onlineFriends' => $user->getOnlineFriends(),
             // The rank model and its displayable columns differ per driver.
             'user' => $user->load(['permission' => fn ($query) => app(RankRepository::class)->forDisplay($query)]),

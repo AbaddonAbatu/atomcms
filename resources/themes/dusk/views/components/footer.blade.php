@@ -6,4 +6,4 @@
     &copy {{ date('Y') }} {{ setting('hotel_name') }} {{ __('is a not for profit educational project & is in no way affiliated with Sulake Corporation Oy.') }}
 </footer>
 
-<x-footer-credits />
+<x-theme-dusk::footer-credits />

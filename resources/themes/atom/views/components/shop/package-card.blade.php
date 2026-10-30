@@ -1,6 +1,6 @@
 @props(['package'])
 
-<x-content.shop-card classes="border dark:border-gray-900">
+<x-theme-atom::content.shop-card classes="border dark:border-gray-900">
     <x-slot:title>
         {{ $package->name }}
     </x-slot:title>
@@ -47,14 +47,14 @@
             confirmMessage: '',
         }">
             @if($package->is_giftable)
-                <x-modals.modal-wrapper>
+                <x-theme-atom::modals.modal-wrapper>
                     <div x-on:click="open = true">
-                        <x-form.primary-button type="button" classes="px-10">
-                            <x-icons.gift />
-                        </x-form.primary-button>
+                        <x-theme-atom::form.primary-button type="button" classes="px-10">
+                            <x-theme-atom::icons.gift />
+                        </x-theme-atom::form.primary-button>
                     </div>
 
-                    <x-modals.regular-modal>
+                    <x-theme-atom::modals.regular-modal>
                         <x-slot name="title">
                             <h2 class="text-2xl">
                                 {{ __('Gift :package', ['package' => $package->name]) }}
@@ -169,8 +169,8 @@
                                 </button>
                             </form>
                         </div>
-                    </x-modals.regular-modal>
-                </x-modals.modal-wrapper>
+                    </x-theme-atom::modals.regular-modal>
+                </x-theme-atom::modals.modal-wrapper>
             @endif
 
             <form x-ref="buyForm" action="{{ route('shop.buy-package', $package) }}" method="POST" class="w-full"
@@ -222,4 +222,4 @@
             </div>
         </div>
     @endauth
-</x-content.shop-card>
+</x-theme-atom::content.shop-card>

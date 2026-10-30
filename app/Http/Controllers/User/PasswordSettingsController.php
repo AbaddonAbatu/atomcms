@@ -5,14 +5,14 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PasswordSettingsFormRequest;
 use App\Support\AuthenticatedUser;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class PasswordSettingsController extends Controller
 {
     public function edit(): View
     {
-        return view('user.settings.password');
+        return theme_view('user.settings.password');
     }
 
     public function update(PasswordSettingsFormRequest $request): RedirectResponse

@@ -1,0 +1,1 @@
+<div class="aurora-card"><h2>Friends</h2>@forelse ($user->friends as $friend)<p>{{ $friend->user->username }}</p>@empty<p class="aurora-muted">No friends yet.</p>@endforelse{{ $user->friends->links() }}</div>

@@ -1,4 +1,4 @@
-<x-content.content-card icon="discord-icon" classes="border dark:border-gray-900">
+<x-theme-atom::content.content-card icon="discord-icon" classes="border dark:border-gray-900">
     <x-slot:title>
         {{ __('Discord') }}
     </x-slot:title>
@@ -10,12 +10,12 @@
     <div class="text-sm dark:text-gray-200">
         <div id="guildUsers" class="h-[129px] overflow-auto"> </div>
         <a id="guildInvite" target="blank">
-            <x-form.secondary-button classes="mt-3">
+            <x-theme-atom::form.secondary-button classes="mt-3">
                 {{ __('Join server') }}
-            </x-form.secondary-button>
+            </x-theme-atom::form.secondary-button>
         </a>
     </div>
-</x-content.content-card>
+</x-theme-atom::content.content-card>
 
 @push('javascript')
     <script>

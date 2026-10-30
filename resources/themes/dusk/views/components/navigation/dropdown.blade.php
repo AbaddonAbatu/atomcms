@@ -108,13 +108,13 @@
     >
     @endif
         @if(isset($icon))
-            <img @class(['icon', 'hidden lg:block' => $responsive]) src="{{ asset(sprintf('/assets/images/dusk/%s', $icon)) }}" alt="">
+            <img @class(['icon', 'hidden lg:block' => $responsive]) src="{{ asset('/assets/images/dusk/' . $icon) }}" alt="">
         @endif
 
         {{ $slot }}
 
         @if(($showChevron || $responsive) && !$href)
-            <x-navigation.chevron :classes="$responsive && !$showChevron ? 'lg:hidden' : ''" />
+            <x-theme-dusk::navigation.chevron :classes="$responsive && !$showChevron ? 'lg:hidden' : ''" />
         @endif
     @if($href)
     </a>
@@ -127,7 +127,7 @@
         :aria-controls="$id('dropdown-button')"
     >
         <span class="sr-only">{{ $slot }}</span>
-        <x-navigation.chevron />
+        <x-theme-dusk::navigation.chevron />
     </button>
     @else
     </button>
